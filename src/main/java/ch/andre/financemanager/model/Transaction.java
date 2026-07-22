@@ -72,7 +72,7 @@ public class Transaction {
         this.type = Objects.requireNonNull(type, "Die Buchungsart darf nicht null sein.");
     }
 
-    public Category category() {
+    public Category getCategory() {
         return category;
     }
 

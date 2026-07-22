@@ -1,6 +1,10 @@
 package ch.andre.financemanager;
 
-import ch.andre.financemanager.model.*;
+import ch.andre.financemanager.model.Account;
+import ch.andre.financemanager.model.AccountType;
+import ch.andre.financemanager.model.Category;
+import ch.andre.financemanager.model.Transaction;
+import ch.andre.financemanager.model.TransactionType;
 import ch.andre.financemanager.service.FinanceService;
 
 import java.math.BigDecimal;
@@ -66,14 +70,14 @@ public class Main {
 
         BigDecimal totalIncome = financeService.calculateTotalIncome (account, transactions);
 
-        BigDecimal totalExpense = financeService.calculateTotalExpense(account, transactions);
+        BigDecimal totalExpenses = financeService.calculateTotalExpenses(account, transactions);
 
         BigDecimal netResult = financeService.calculateNetResult(account, transactions);
 
         String currencyCode = account.getCurrency().getCurrencyCode();
 
         System.out.println("Einnahmen: " + totalIncome + " " + currencyCode);
-        System.out.println("Ausgaben: " + totalExpense + " " + currencyCode);
+        System.out.println("Ausgaben: " + totalExpenses + " " + currencyCode);
         System.out.println("Nettoergebnis: " + netResult + " " + currencyCode);
     }
 

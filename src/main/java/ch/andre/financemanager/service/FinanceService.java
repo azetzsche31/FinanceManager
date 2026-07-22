@@ -14,12 +14,15 @@ public class FinanceService {
             Account account,
             List<Transaction> transactions
     ) {
-        Objects.requireNonNull(account, "Das Konto darf nicht null sein.");
-        Objects.requireNonNull(transactions, "Die Buchungsliste darf nicht null sein.");
+
 
         BigDecimal balance = account.getOpeningBalance();
 
         for (Transaction transaction : transactions) {
+
+            Objects.requireNonNull(account, "Das Konto darf nicht null sein.");
+            Objects.requireNonNull(transactions, "Die Buchungsliste darf nicht null sein.");
+
             if (belongsToAccount(transaction, account)) {
                 balance = balance.add(transaction.getSignedAmount());
             }
@@ -33,12 +36,14 @@ public class FinanceService {
             Account account,
             List<Transaction> transactions
     ) {
-        Objects.requireNonNull(account, "Das Konto darf nicht null sein.");
-        Objects.requireNonNull(transactions, "Die Buchungsliste darf nicht null sein.");
+
 
         BigDecimal totalIncome = BigDecimal.ZERO;
 
         for (Transaction transaction : transactions) {
+
+            Objects.requireNonNull(account, "Das Konto darf nicht null sein.");
+            Objects.requireNonNull(transactions, "Die Buchungsliste darf nicht null sein.");
 
             boolean isIncome =
                     transaction.getType() == TransactionType.INCOME;
@@ -51,16 +56,19 @@ public class FinanceService {
         return totalIncome;
     }
 
-    public BigDecimal calculateTotalExpense (
+    public BigDecimal calculateTotalExpenses (
             Account account,
             List<Transaction> transactions
     ) {
-        Objects.requireNonNull(account, "Das Konto darf nicht null sein.");
-        Objects.requireNonNull(transactions, "Die Buchungsliste darf nicht null sein.");
+
 
         BigDecimal totalExpense = BigDecimal.ZERO;
 
         for (Transaction transaction : transactions) {
+
+            Objects.requireNonNull(account, "Das Konto darf nicht null sein.");
+            Objects.requireNonNull(transactions, "Die Buchungsliste darf nicht null sein.");
+
             boolean isExpense =
                     transaction.getType() == TransactionType.EXPENSE;
 
@@ -77,13 +85,17 @@ public class FinanceService {
             List<Transaction> transactions
     ) {
         BigDecimal income = calculateTotalIncome(account, transactions);
-        BigDecimal expense = calculateTotalExpense(account, transactions);
+        BigDecimal expenses = calculateTotalExpenses(account, transactions);
 
-        return income.subtract(expense);
+        return income.subtract(expenses);
     }
 
-    private boolean belongsToAccount(Transaction transaction, Account account){
-        return transaction.getAccount().getId().equals(account.getId());
+    private boolean belongsToAccount(
+            Transaction transaction,
+            Account account){
+        return transaction.getAccount()
+                .getId()
+                .equals(account.getId());
     }
 
 }
