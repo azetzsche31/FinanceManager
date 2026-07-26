@@ -1,9 +1,12 @@
 package ch.andre.financemanager.model;
 
-    import java.math.BigDecimal;
-    import java.util.Currency;
-    import java.util.Objects;
-    import java.util.UUID;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Currency;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public class Account {
 
@@ -12,6 +15,7 @@ public class Account {
     private AccountType type;
     private BigDecimal openingBalance;
     private Currency currency;
+    private final List<Transaction> transactions = new ArrayList<>();
 
     public Account(String name, AccountType type, BigDecimal openingBalance, Currency currency) {
         this.id = UUID.randomUUID();
@@ -69,6 +73,35 @@ public class Account {
                 "Die Währung darf nicht null sein."
         );
     }
+
+    public void addTransaction(Transaction transaction) {
+        Objects.requireNonNull(
+                transaction,
+                "Die Transaktion darf nicht null sein."
+        );
+
+        if (!transaction.getAccount().getId().equals(this.id)) {
+            throw new IllegalArgumentException(
+                    "Die Transaktion gehört nicht zu diesem Konto."
+            );
+        }
+
+        if (transactions.contains(transaction)) {
+            throw new IllegalArgumentException(
+                    "Die Transaktion wurde diesem Konto berits hinzugefügt."
+            );
+        }
+
+        transactions.add(transaction);
+    }
+
+    public List<Transaction> getTransactions() {
+        return List.copyOf(transactions);
+    }
+
+
+
+
 
     @Override
     public String toString() {

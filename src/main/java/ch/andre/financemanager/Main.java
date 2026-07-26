@@ -10,7 +10,6 @@ import ch.andre.financemanager.service.FinanceService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
-import java.util.List;
 
 public class Main {
 
@@ -49,18 +48,14 @@ public class Main {
                 account
         );
 
-        List<Transaction> transactions = List.of(
-                salary,
-                groceries,
-                rent
-        );
+        account.addTransaction(salary);
+        account.addTransaction(groceries);
+        account.addTransaction(rent);
+
 
         FinanceService financeService = new FinanceService();
 
-        BigDecimal balance = financeService.calculateBalance(
-                account,
-                transactions
-        );
+        BigDecimal balance = financeService.calculateBalance(account);
 
         System.out.println("Aktueller Kontostand: "
                 + balance
@@ -68,11 +63,11 @@ public class Main {
                 + account.getCurrency().getCurrencyCode());
 
 
-        BigDecimal totalIncome = financeService.calculateTotalIncome (account, transactions);
+        BigDecimal totalIncome = financeService.calculateTotalIncome (account);
 
-        BigDecimal totalExpenses = financeService.calculateTotalExpenses(account, transactions);
+        BigDecimal totalExpenses = financeService.calculateTotalExpenses(account);
 
-        BigDecimal netResult = financeService.calculateNetResult(account, transactions);
+        BigDecimal netResult = financeService.calculateNetResult(account);
 
         String currencyCode = account.getCurrency().getCurrencyCode();
 

@@ -14,9 +14,15 @@ public class Transaction {
     private String description;
     private TransactionType type;
     private Category category;
-    private Account account;
+    private final Account account;
 
-    public Transaction(LocalDate date, BigDecimal amount, String description, TransactionType type, Category category, Account account){
+    public Transaction(
+            LocalDate date,
+            BigDecimal amount,
+            String description,
+            TransactionType type,
+            Category category,
+            Account account){
 
         this.id = UUID.randomUUID();
         setDate(date);
@@ -24,7 +30,10 @@ public class Transaction {
         setDescription(description);
         setType(type);
         setCategory(category);
-        setAccount(account);
+        this.account = Objects.requireNonNull(
+                account,
+                "Das Konto darf nicht null sein."
+        );
     }
 
     public UUID getId() {
@@ -36,7 +45,7 @@ public class Transaction {
     }
 
     public void setDate(LocalDate date) {
-        this.date = Objects.requireNonNull(date, "Das Buchungsdatum darf nicht leer sein.");
+        this.date = Objects.requireNonNull(date, "Das Buchungsdatum darf nicht null sein.");
     }
 
     public BigDecimal getAmount() {
@@ -44,7 +53,7 @@ public class Transaction {
     }
 
     public void setAmount(BigDecimal amount) {
-        Objects.requireNonNull(amount, "Der Betrag darf nicht leer sein.");
+        Objects.requireNonNull(amount, "Der Betrag darf nicht null sein.");
 
         if(amount.signum() <= 0) {
             throw new IllegalArgumentException("Der Betrag muss grösser als null sein.");
@@ -82,10 +91,6 @@ public class Transaction {
 
     public Account getAccount() {
         return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = Objects.requireNonNull(account, "Das Konto darf nicht null sein.");
     }
 
     public BigDecimal getSignedAmount() {
