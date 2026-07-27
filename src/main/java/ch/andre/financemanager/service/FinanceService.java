@@ -1,9 +1,6 @@
 package ch.andre.financemanager.service;
 
-import ch.andre.financemanager.model.Account;
-import ch.andre.financemanager.model.Category;
-import ch.andre.financemanager.model.Transaction;
-import ch.andre.financemanager.model.TransactionType;
+import ch.andre.financemanager.model.*;
 
 import javax.swing.*;
 import java.math.BigDecimal;
@@ -249,6 +246,25 @@ public class FinanceService {
 
         return totalExpenses;
 
+    }
+
+    public MonthlyReport createMonthlyReport(
+            Account account,
+            Month month,
+            int year
+    ) {
+        BigDecimal income = calculateTotalIncome(account, month, year);
+        BigDecimal expenses = calculateTotalExpenses(account, month, year);
+        BigDecimal net = calculateNetResult(account, month, year);
+
+        return new MonthlyReport(
+                account,
+                month,
+                year,
+                income,
+                expenses,
+                net
+        );
     }
 
 

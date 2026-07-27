@@ -1,10 +1,6 @@
 package ch.andre.financemanager;
 
-import ch.andre.financemanager.model.Account;
-import ch.andre.financemanager.model.AccountType;
-import ch.andre.financemanager.model.Category;
-import ch.andre.financemanager.model.Transaction;
-import ch.andre.financemanager.model.TransactionType;
+import ch.andre.financemanager.model.*;
 import ch.andre.financemanager.service.FinanceService;
 
 import java.math.BigDecimal;
@@ -56,26 +52,18 @@ public class Main {
 
         FinanceService financeService = new FinanceService();
 
-        BigDecimal balance = financeService.calculateBalance(account);
+        MonthlyReport julyReport =
+                financeService.createMonthlyReport(
+                        account,
+                        Month.JULY,
+                        2026
+                );
 
-        System.out.println("Aktueller Kontostand: "
-                + balance
-                + " "
-                + account.getCurrency().getCurrencyCode());
-
-
-        BigDecimal totalIncome = financeService.calculateTotalIncome (account);
-
-        BigDecimal totalExpenses = financeService.calculateTotalExpenses(account);
-
-        BigDecimal netResult = financeService.calculateNetResult(account);
-
-        String currencyCode = account.getCurrency().getCurrencyCode();
-
-        System.out.println("Einnahmen: " + totalIncome + " " + currencyCode);
-        System.out.println("Ausgaben: " + totalExpenses + " " + currencyCode);
-        System.out.println("Nettoergebnis: " + netResult + " " + currencyCode);
+        System.out.println();
+        System.out.println(julyReport);
     }
+
+
 
 
 
