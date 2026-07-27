@@ -27,7 +27,7 @@ class FinanceServiceTest {
         );
 
         Transaction salary = new Transaction(
-                LocalDate.of(2026,7,1),
+                LocalDate.of(2026, 7, 1),
                 new BigDecimal("4200.00"),
                 "Monatslohn",
                 TransactionType.INCOME,
@@ -36,7 +36,7 @@ class FinanceServiceTest {
         );
 
         Transaction groceries = new Transaction(
-                LocalDate.of(2026,7,5),
+                LocalDate.of(2026, 7, 5),
                 new BigDecimal("52.30"),
                 "Lebensmitteleinkauf",
                 TransactionType.EXPENSE,
@@ -76,7 +76,7 @@ class FinanceServiceTest {
                 account
         );
         Transaction groceries = new Transaction(
-                LocalDate.of(2026,7,5),
+                LocalDate.of(2026, 7, 5),
                 new BigDecimal("52.30"),
                 "Lebensmitteleinkauf",
                 TransactionType.EXPENSE,
@@ -164,7 +164,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense1 = new Transaction(
-                LocalDate.of(2026,7,1),
+                LocalDate.of(2026, 7, 1),
                 new BigDecimal("100.00"),
                 "Kaffee",
                 TransactionType.EXPENSE,
@@ -173,7 +173,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense2 = new Transaction(
-                LocalDate.of(2026,7,15),
+                LocalDate.of(2026, 7, 15),
                 new BigDecimal("50.00"),
                 "Lebenmittel",
                 TransactionType.EXPENSE,
@@ -182,7 +182,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense3 = new Transaction(
-                LocalDate.of(2026,8,3),
+                LocalDate.of(2026, 8, 3),
                 new BigDecimal("200.00"),
                 "Sport",
                 TransactionType.EXPENSE,
@@ -220,7 +220,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense1 = new Transaction(
-                LocalDate.of(2026, 1,10),
+                LocalDate.of(2026, 1, 10),
                 new BigDecimal("100.00"),
                 "Lebensmittel",
                 TransactionType.EXPENSE,
@@ -229,7 +229,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense2 = new Transaction(
-                LocalDate.of(2026,7,15),
+                LocalDate.of(2026, 7, 15),
                 new BigDecimal("50.00"),
                 "Restaurant",
                 TransactionType.EXPENSE,
@@ -238,7 +238,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense3 = new Transaction(
-                LocalDate.of(2025,12,20),
+                LocalDate.of(2025, 12, 20),
                 new BigDecimal("200.00"),
                 "Versicherung",
                 TransactionType.EXPENSE,
@@ -247,7 +247,7 @@ class FinanceServiceTest {
         );
 
         Transaction income = new Transaction(
-                LocalDate.of(2026,7,25),
+                LocalDate.of(2026, 7, 25),
                 new BigDecimal("4200.00"),
                 "Monatslohn",
                 TransactionType.INCOME,
@@ -285,7 +285,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense1 = new Transaction(
-                LocalDate.of(2026, 1,10),
+                LocalDate.of(2026, 1, 10),
                 new BigDecimal("100.00"),
                 "Lebensmittel",
                 TransactionType.EXPENSE,
@@ -294,7 +294,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense2 = new Transaction(
-                LocalDate.of(2026,7,15),
+                LocalDate.of(2026, 7, 15),
                 new BigDecimal("50.00"),
                 "Restaurant",
                 TransactionType.EXPENSE,
@@ -303,7 +303,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense3 = new Transaction(
-                LocalDate.of(2025,12,20),
+                LocalDate.of(2025, 12, 20),
                 new BigDecimal("200.00"),
                 "Versicherung",
                 TransactionType.EXPENSE,
@@ -312,7 +312,7 @@ class FinanceServiceTest {
         );
 
         Transaction income = new Transaction(
-                LocalDate.of(2026,7,25),
+                LocalDate.of(2026, 7, 25),
                 new BigDecimal("4200.00"),
                 "Monatslohn",
                 TransactionType.INCOME,
@@ -351,7 +351,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense1 = new Transaction(
-                LocalDate.of(2026, 1,10),
+                LocalDate.of(2026, 1, 10),
                 new BigDecimal("100.00"),
                 "Lebensmittel",
                 TransactionType.EXPENSE,
@@ -360,7 +360,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense2 = new Transaction(
-                LocalDate.of(2026,7,15),
+                LocalDate.of(2026, 7, 15),
                 new BigDecimal("50.00"),
                 "Restaurant",
                 TransactionType.EXPENSE,
@@ -369,7 +369,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense3 = new Transaction(
-                LocalDate.of(2025,12,20),
+                LocalDate.of(2025, 12, 20),
                 new BigDecimal("200.00"),
                 "Versicherung",
                 TransactionType.EXPENSE,
@@ -378,7 +378,7 @@ class FinanceServiceTest {
         );
 
         Transaction income = new Transaction(
-                LocalDate.of(2026,7,25),
+                LocalDate.of(2026, 7, 25),
                 new BigDecimal("4200.00"),
                 "Monatslohn",
                 TransactionType.INCOME,
@@ -426,7 +426,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense1 = new Transaction(
-                LocalDate.of(2026, 1,10),
+                LocalDate.of(2026, 1, 10),
                 new BigDecimal("100.00"),
                 "Lebensmittel",
                 TransactionType.EXPENSE,
@@ -435,7 +435,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense2 = new Transaction(
-                LocalDate.of(2026,7,15),
+                LocalDate.of(2026, 7, 15),
                 new BigDecimal("50.00"),
                 "Restaurant",
                 TransactionType.EXPENSE,
@@ -444,7 +444,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense3 = new Transaction(
-                LocalDate.of(2025,12,20),
+                LocalDate.of(2025, 12, 20),
                 new BigDecimal("200.00"),
                 "Versicherung",
                 TransactionType.EXPENSE,
@@ -453,7 +453,7 @@ class FinanceServiceTest {
         );
 
         Transaction income = new Transaction(
-                LocalDate.of(2026,7,25),
+                LocalDate.of(2026, 7, 25),
                 new BigDecimal("4200.00"),
                 "Monatslohn",
                 TransactionType.INCOME,
@@ -501,7 +501,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense1 = new Transaction(
-                LocalDate.of(2026, 1,10),
+                LocalDate.of(2026, 1, 10),
                 new BigDecimal("100.00"),
                 "Lebensmittel",
                 TransactionType.EXPENSE,
@@ -510,7 +510,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense2 = new Transaction(
-                LocalDate.of(2026,7,15),
+                LocalDate.of(2026, 7, 15),
                 new BigDecimal("50.00"),
                 "Restaurant",
                 TransactionType.EXPENSE,
@@ -519,7 +519,7 @@ class FinanceServiceTest {
         );
 
         Transaction expense3 = new Transaction(
-                LocalDate.of(2025,12,20),
+                LocalDate.of(2025, 12, 20),
                 new BigDecimal("200.00"),
                 "Versicherung",
                 TransactionType.EXPENSE,
@@ -528,7 +528,7 @@ class FinanceServiceTest {
         );
 
         Transaction income = new Transaction(
-                LocalDate.of(2026,7,25),
+                LocalDate.of(2026, 7, 25),
                 new BigDecimal("4200.00"),
                 "Monatslohn",
                 TransactionType.INCOME,
@@ -555,6 +555,72 @@ class FinanceServiceTest {
         );
     }
 
+    @Test
+    void calculateTotalExpensesReturnsExpensesForCategory() {
+
+        Account account = new Account(
+                "Lohnkonto",
+                AccountType.CHECKING,
+                BigDecimal.ZERO,
+                Currency.getInstance("CHF")
+        );
+
+        Transaction income = new Transaction(
+                LocalDate.of(2026, 4, 25),
+                new BigDecimal("4200.00"),
+                "Lohn",
+                TransactionType.INCOME,
+                Category.SALARY,
+                account
+        );
+
+        Transaction expense1 = new Transaction(
+                LocalDate.of(2026, 5, 1),
+                new BigDecimal("100.00"),
+                "Lebensmittel",
+                TransactionType.EXPENSE,
+                Category.GROCERIES,
+                account
+        );
+
+        Transaction expense2 = new Transaction(
+                LocalDate.of(2026, 5, 10),
+                new BigDecimal("50.00"),
+                "Esswaren",
+                TransactionType.EXPENSE,
+                Category.GROCERIES,
+                account
+        );
+
+        Transaction expense3 = new Transaction(
+                LocalDate.of(2026, 5, 30),
+                new BigDecimal("200.00"),
+                "Hobby",
+                TransactionType.EXPENSE,
+                Category.LEISURE,
+                account
+        );
+
+        account.addTransaction(income);
+        account.addTransaction(expense1);
+        account.addTransaction(expense2);
+        account.addTransaction(expense3);
+
+
+        FinanceService financeService = new FinanceService();
+
+        BigDecimal result =
+                financeService.calculateTotalExpenses(
+                        account,
+                        Category.GROCERIES
+                );
+
+        assertEquals(
+                new BigDecimal("150.00"),
+
+                result
+        );
+    }
 
 
 }

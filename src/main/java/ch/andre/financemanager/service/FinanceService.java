@@ -1,6 +1,7 @@
 package ch.andre.financemanager.service;
 
 import ch.andre.financemanager.model.Account;
+import ch.andre.financemanager.model.Category;
 import ch.andre.financemanager.model.Transaction;
 import ch.andre.financemanager.model.TransactionType;
 
@@ -216,5 +217,41 @@ public class FinanceService {
 
         return filteredTransactions;
     }
+
+    public BigDecimal calculateTotalExpenses(
+            Account account,
+            Category category
+    ) {
+        Objects.requireNonNull(
+                account,
+                "Das Konto darf nicht null sein."
+        );
+
+        Objects.requireNonNull(
+                category,
+                "Die Kategorie darf nicht null sein."
+        );
+
+        BigDecimal totalExpenses = BigDecimal.ZERO;
+
+        for (Transaction transaction : account.getTransactions()) {
+            boolean isExpense =
+                    transaction.getType() == TransactionType.EXPENSE;
+
+            boolean isCorrectCategory =
+                    transaction.getCategory() == category;
+
+            if(isExpense && isCorrectCategory) {
+                totalExpenses =
+                        totalExpenses.add(transaction.getAmount());
+            }
+        }
+
+        return totalExpenses;
+
+    }
+
+
+
 
 }
