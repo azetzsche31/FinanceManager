@@ -9,6 +9,7 @@ import ch.andre.financemanager.service.FinanceService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Currency;
 
 public class Main {
