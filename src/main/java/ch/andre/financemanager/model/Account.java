@@ -88,20 +88,27 @@ public class Account {
 
         if (transactions.contains(transaction)) {
             throw new IllegalArgumentException(
-                    "Die Transaktion wurde diesem Konto berits hinzugefügt."
+                    "Die Transaktion wurde diesem Konto bereits hinzugefügt."
             );
         }
 
         transactions.add(transaction);
     }
 
+    public void addTransactions(List<Transaction> transactions) {
+        Objects.requireNonNull(
+                transactions,
+                "Die Transaktionsliste darf nicht null sein."
+        );
+
+        for (Transaction transaction : transactions) {
+            addTransaction(transaction);
+        }
+    }
+
     public List<Transaction> getTransactions() {
         return List.copyOf(transactions);
     }
-
-
-
-
 
     @Override
     public String toString() {

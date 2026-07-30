@@ -177,6 +177,29 @@ public class CsvImportServiceTest {
         );
     }
 
+    @Test
+    void importedTransactionsCanBeAddedToAccount()
+        throws URISyntaxException {
 
+        URL resource = getClass()
+                .getClassLoader()
+                .getResource("csv/valid-transactions.csv");
 
+        assertNotNull(
+                resource,
+                "Die Testdatei valid-transactions.csv wurde nicht gefunden."
+        );
+
+        Path file = Path.of(resource.toURI());
+
+        CsvImportResult result =
+                csvImportService.importTransactions(file, account);
+
+        account.addTransactions(result.getTransactions());
+
+        assertEquals(
+                3,
+                account.getTransactions().size()
+        );
+    }
 }
