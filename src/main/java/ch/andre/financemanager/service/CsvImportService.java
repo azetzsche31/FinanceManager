@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 
 public class CsvImportService {
@@ -66,7 +65,13 @@ public class CsvImportService {
             String line,
             Account account
     ) {
-        String[] values = line.split(";");
+        String[] values = parseCsvLine(line);
+
+        if(values.length != 5) {
+            throw new IllegalArgumentException(
+                    "Ungültige Anzahl CSV-Spalten: " + values.length
+            );
+        }
 
         LocalDate date = parseDate(values[0]);
         BigDecimal amount = parseAmount(values[1]);
@@ -133,6 +138,31 @@ public class CsvImportService {
                     e
             );
         }
+    }
+
+    private String[] parseCsvLine(String line) {
+
+        boolean insideQuotes = false;
+        List<String> values = new ArrayList<>();
+        StringBuilder currentValue = new StringBuilder();
+
+        for (int i = 0; i < line.length(); i++) {
+            char currentCharacter = line.charAt(i);
+
+            if (currentCharacter == '"') {
+                insideQuotes = !insideQuotes;
+            } else if (currentCharacter == ';' && !insideQuotes) {
+                values.add(currentValue.toString());
+                currentValue.setLength(0);
+            } else {
+                currentValue.append(currentCharacter);
+            }
+        }
+
+        values.add(currentValue.toString());
+        System.out.println(values);
+
+        return values.toArray(new String[0]);
     }
 
 

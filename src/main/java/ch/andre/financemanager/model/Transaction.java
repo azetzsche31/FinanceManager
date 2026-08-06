@@ -101,12 +101,11 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return date
-                + " | "
-                + description
-                +" | "
-                + getSignedAmount()
-                +" "
-                +account.getCurrency().getCurrencyCode();
+        return "%s | %s | %s %s".formatted(
+                date,
+                description,
+                getSignedAmount(),
+                account.getCurrency().getCurrencyCode()
+        );
     }
 }
