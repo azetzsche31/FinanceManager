@@ -1,0 +1,3 @@
+date;amount;description;type;category
+2026-07-01;5000.00;Lohn;INCOME;SALARY
+2026-07-05;2500;Miete;EXPENSE;HOUSING

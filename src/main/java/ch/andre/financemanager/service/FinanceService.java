@@ -267,6 +267,23 @@ public class FinanceService {
         );
     }
 
+    public YearlyReport createYearlyReport(
+            Account account,
+            int year
+    ) {
+        BigDecimal income = calculateTotalIncome(account, year);
+        BigDecimal expenses = calculateTotalExpenses(account, year);
+        BigDecimal net = calculateNetResult(account, year);
+
+        return new YearlyReport(
+                account,
+                year,
+                income,
+                expenses,
+                net
+        );
+    }
+
 
 
 

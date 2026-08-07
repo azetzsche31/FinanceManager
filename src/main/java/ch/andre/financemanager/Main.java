@@ -6,10 +6,13 @@ import ch.andre.financemanager.service.CsvExportService;
 import ch.andre.financemanager.service.CsvImportService;
 import ch.andre.financemanager.service.FinanceService;
 
+import javax.lang.model.element.NestingKind;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Currency;
-import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
@@ -58,6 +61,22 @@ public class Main {
                     addTransaction();
                     break;
 
+                case "4":
+                    csvImport();
+                    break;
+
+                case "5":
+                    csvExport();
+                    break;
+
+                case "6":
+                    createMonthlyReport();
+                    break;
+
+                case "7":
+                    createYearlyReport();
+                    break;
+
                 case "0":
                     running = false;
                     break;
@@ -71,6 +90,7 @@ public class Main {
 
         System.out.println("Finance Manager wurde beendet.");
     }
+
 
     private void printMenu() {
         System.out.println();
@@ -86,7 +106,7 @@ public class Main {
         System.out.println("7. Jahresbericht anzeigen");
         System.out.println();
         System.out.println("0. Programm beenden");
-        System.out.println("Auswahl: ");
+        System.out.print("Auswahl: ");
     }
 
     private void    showBalance() {
@@ -121,44 +141,23 @@ public class Main {
         System.out.println();
         System.out.println("===== Neue Transaktion =====");
 
-        System.out.println("Datum (YYYY-MM-DD: ");
+        System.out.print("Datum (YYYY-MM-DD: ");
         String dateInput = scanner.nextLine();
 
-        System.out.println("Betrag: ");
+        System.out.print("Betrag: ");
         String amountInput = scanner.nextLine();
 
-        System.out.println("Beschreibung: ");
+        System.out.print("Beschreibung: ");
         String description = scanner.nextLine();
 
-        System.out.println();
-        System.out.println("Verfügbare Typen: ");
+        TransactionType type = readTransactionType();
 
-        for (TransactionType type : TransactionType.values()) {
-            System.out.println("- "+ type);
-        }
-
-        System.out.println("Typ: ");
-        String typeInput = scanner.nextLine();
-
-        System.out.println();
-        System.out.println("Verfügbare Kategorien");
-
-        for (Category category : Category.values()) {
-            System.out.println("- "+ category);
-        }
-
-        System.out.println("Kategorie: ");
-        String categoryInput = scanner.nextLine();
+        Category category = readCategory();
 
         LocalDate date = LocalDate.parse(dateInput);
 
         BigDecimal amount = new BigDecimal(amountInput);
 
-        TransactionType type =
-                TransactionType.valueOf(typeInput.toUpperCase());
-
-        Category category =
-                Category.valueOf(categoryInput.toUpperCase());
 
 
         Transaction transaction = new Transaction(
@@ -187,4 +186,167 @@ public class Main {
         System.out.println("-----------------------------------------");
 
     }
+
+    private TransactionType readTransactionType() {
+
+        while (true) {
+            System.out.println();
+            System.out.println("Verfügbare Typen:");
+
+            for (TransactionType type : TransactionType.values()) {
+                System.out.println("- " + type);
+            }
+
+            System.out.print("Typ: ");
+            String input = scanner.nextLine();
+
+            try {
+                return TransactionType.valueOf(
+                        input.trim().toUpperCase()
+                );
+            } catch (IllegalArgumentException exception) {
+                System.out.println();
+                System.out.println(
+                        "Ungültiger Transaktionstyp. Bitte erneut eingeben."
+                );
+            }
+        }
+    }
+
+    private Category readCategory() {
+
+        while (true) {
+            System.out.println();
+            System.out.println("Verfügbare Kategorien:");
+
+            for (Category category : Category.values()) {
+                System.out.println("- "+ category);
+            }
+
+            System.out.print("Kategorie: ");
+            String input = scanner.nextLine();
+
+            try {
+                return Category.valueOf(
+                        input.trim().toUpperCase()
+                );
+            }   catch (IllegalArgumentException exception) {
+                System.out.println();
+                System.out.println(
+                        "Ungültige Kategorie. Bitte erneut eingeben."
+                );
+            }
+        }
+    }
+
+    private void csvImport() {
+
+        System.out.println();
+        System.out.println("===== CSV Import =====");
+        System.out.println();
+        System.out.print("Pfad zur CSV-Datei: ");
+        String path = scanner.nextLine();
+
+        Path file = Path.of(path);
+
+        CsvImportResult result =
+                csvImportService.importTransactions(
+                        file,
+                        account
+                );
+
+        account.addTransactions(
+                result.getTransactions()
+        );
+
+        System.out.println();
+        System.out.println("CSV-Import abgeschlossen.");
+        System.out.println();
+
+        System.out.println(
+                "Importierte Transaktionen: "
+                    + result.getImportedCount()
+        );
+
+        System.out.println(
+                "Fehler: "
+                    + result.getErrorCount()
+        );
+    }
+
+    private void csvExport() {
+
+        System.out.println();
+        System.out.println("===== CSV Export =====");
+        System.out.println();
+
+        System.out.print("Pfad für die CSV-Datei: ");
+        String pathInput = scanner.nextLine();
+
+        Path file = Path.of(pathInput);
+
+        try {
+            csvExportService.exportTransactions(
+                    file,
+                    account
+            );
+
+            System.out.println();
+            System.out.printf("CSV-Export erfolgreich abgeschlossen.");
+            System.out.println(
+                    "Exportierte Transaktionen: "
+                        + account.getTransactions().size()
+            );
+            System.out.println("Datei: " + file.toAbsolutePath());
+        } catch (IOException exception) {
+            System.out.println();
+            System.out.println(
+                    "Die CSV-Datei konnte nicht exportiert werden."
+            );
+            System.out.println(
+                    "Grund: " + exception.getMessage()
+            );
+        }
+    }
+
+    private void createMonthlyReport() {
+
+
+        System.out.println();
+        System.out.println("===== Monatsbericht ======");
+        System.out.print("Monat: (1-12): ");
+        int monthNumber = Integer.parseInt(scanner.nextLine());
+        System.out.print("Jahr: ");
+        int year = Integer.parseInt(scanner.nextLine());
+
+        Month month = Month.of(monthNumber);
+
+
+        MonthlyReport report =
+                financeService.createMonthlyReport(
+                        account,
+                        month,
+                        year
+                );
+        System.out.println(report);
+
+    }
+
+    private void createYearlyReport() {
+
+        System.out.println();
+        System.out.println("===== Jahresbericht =====");
+        System.out.print("Jahr: ");
+        int year = Integer.parseInt(scanner.nextLine());
+
+        YearlyReport report =
+                financeService.createYearlyReport(
+                        account,
+                        year
+                );
+
+        System.out.println(report);
+    }
+
+
 }
