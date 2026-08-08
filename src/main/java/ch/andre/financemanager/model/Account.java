@@ -17,12 +17,37 @@ public class Account {
     private Currency currency;
     private final List<Transaction> transactions = new ArrayList<>();
 
-    public Account(String name, AccountType type, BigDecimal openingBalance, Currency currency) {
-        this.id = UUID.randomUUID();
+    public Account(
+            UUID id,
+            String name,
+            AccountType type,
+            BigDecimal openingBalance,
+            Currency currency
+    ) {
+        this.id = Objects.requireNonNull(
+                id,
+                "Die Konto-ID darf nicht null sein."
+        );
+
         setName(name);
         setType(type);
         setOpeningBalance(openingBalance);
         setCurrency(currency);
+    }
+
+    public Account(
+            String name,
+            AccountType type,
+            BigDecimal openingBalance,
+            Currency currency
+    ) {
+        this(
+                UUID.randomUUID(),
+                name,
+                type,
+                openingBalance,
+                currency
+        );
     }
 
     public UUID getId() {
