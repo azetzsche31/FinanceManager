@@ -17,14 +17,19 @@ public class Transaction {
     private final Account account;
 
     public Transaction(
+            UUID id,
             LocalDate date,
             BigDecimal amount,
             String description,
             TransactionType type,
             Category category,
-            Account account){
+            Account account
+    ) {
+        this.id = Objects.requireNonNull(
+                id,
+                "Die Transaktions-ID darf nicht null sein."
+        );
 
-        this.id = UUID.randomUUID();
         setDate(date);
         setAmount(amount);
         setDescription(description);
@@ -33,6 +38,25 @@ public class Transaction {
         this.account = Objects.requireNonNull(
                 account,
                 "Das Konto darf nicht null sein."
+        );
+    }
+
+    public Transaction(
+            LocalDate date,
+            BigDecimal amount,
+            String description,
+            TransactionType type,
+            Category category,
+            Account account) {
+
+        this(
+                UUID.randomUUID(),
+                date,
+                amount,
+                description,
+                type,
+                category,
+                account
         );
     }
 
