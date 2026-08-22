@@ -11,6 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -114,6 +116,78 @@ public class TransactionRepository {
 
         }
         return null;
+    }
+
+
+    public List<Transaction> findByAccount(Account account) throws SQLException {
+
+        List<Transaction> transactions =
+                new ArrayList<>();
+
+        String sql = """
+                SELECT *
+                FROM transactions
+                WHERE account_id = ?
+                ORDER BY date
+                """;
+
+        try(Connection connection = databaseManager.getConnection();
+            PreparedStatement statement =
+                    connection.prepareStatement(sql)) {
+
+            statement.setString(
+                    1,
+                    account.getId().toString()
+            );
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+
+                    UUID id = UUID.fromString(
+                        resultSet.getString("id")
+                    );
+
+                    LocalDate date = LocalDate.parse(
+                            resultSet.getString("date")
+                    );
+
+                    BigDecimal amount =
+                            resultSet.getBigDecimal("amount");
+
+                    String description =
+                            resultSet.getString("description");
+
+                    TransactionType type =
+                        TransactionType.valueOf(
+                            resultSet.getString("type")
+                         );
+
+                    Category category =
+                            Category.valueOf(
+                                    resultSet.getString("category")
+                            );
+
+                    Transaction transaction =
+                            new Transaction(
+                                    id,
+                                    date,
+                                    amount,
+                                    description,
+                                    type,
+                                    category,
+                                    account
+                            );
+
+                    transactions.add(transaction);
+
+
+                }
+            }
+        }
+
+        return transactions;
+
     }
 
 

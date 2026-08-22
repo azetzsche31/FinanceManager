@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.Currency;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -185,5 +186,93 @@ void transactionCanBeLoaded() throws SQLException {
     assertEquals(account.getId(),
             loadedTransaction.getAccount().getId()
     );
+    }
+
+    @Test
+    void transactionsCanBeLoadedByAccount() throws SQLException {
+
+        Path databaseFile =
+                tempDirectory.resolve("finance-manager.db");
+
+        DatabaseManager databaseManager =
+                new DatabaseManager(databaseFile.toString());
+
+        databaseManager.createAccountsTable();
+        databaseManager.createTransactionsTable();
+
+        AccountRepository accountRepository =
+                new AccountRepository(databaseManager);
+
+        TransactionRepository transactionRepository =
+                new TransactionRepository(databaseManager);
+
+        Account account = new Account(
+                "Privatkonto",
+                AccountType.CHECKING,
+                new BigDecimal("2500.00"),
+                Currency.getInstance("CHF")
+        );
+
+        accountRepository.save(account);
+
+        Transaction salary = new Transaction (
+                LocalDate.of(2026, 8, 1),
+                new BigDecimal("4200.00"),
+                "Monatslohn",
+                TransactionType.INCOME,
+                Category.SALARY,
+                account
+        );
+
+        Transaction groceries = new Transaction(
+                LocalDate.of(2026, 8, 5),
+                new BigDecimal("85.40"),
+                "Wocheneinkauf",
+                TransactionType.EXPENSE,
+                Category.GROCERIES,
+                account
+        );
+
+        transactionRepository.save(salary);
+        transactionRepository.save(groceries);
+
+        List<Transaction> transactions =
+                transactionRepository.findByAccount(account);
+
+        assertNotNull(transactions);
+        assertEquals(2, transactions.size());
+
+        assertEquals(
+                salary.getId(),
+                transactions.get(0).getId()
+        );
+
+        assertEquals(
+                groceries.getId(),
+                transactions.get(1).getId()
+        );
+
+        assertEquals(
+                salary.getDescription(),
+                transactions.get(0).getDescription()
+        );
+
+        assertEquals(
+                0,
+                salary.getAmount()
+                        .compareTo(transactions.get(0).getAmount())
+        );
+
+        assertEquals(
+                groceries.getDescription(),
+                transactions.get(1).getDescription()
+        );
+
+        assertEquals(
+                0,
+                groceries.getAmount()
+                        .compareTo(transactions.get(1).getAmount())
+        );
+
     }
 }

@@ -6,7 +6,6 @@ import ch.andre.financemanager.service.CsvExportService;
 import ch.andre.financemanager.service.CsvImportService;
 import ch.andre.financemanager.service.FinanceService;
 
-import javax.lang.model.element.NestingKind;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -35,7 +34,7 @@ public class Main {
             Currency.getInstance("CHF")
     );
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
       Main application = new Main();
       application.start();
     }
@@ -292,7 +291,7 @@ public class Main {
             );
 
             System.out.println();
-            System.out.printf("CSV-Export erfolgreich abgeschlossen.");
+            System.out.print("CSV-Export erfolgreich abgeschlossen.");
             System.out.println(
                     "Exportierte Transaktionen: "
                         + account.getTransactions().size()
