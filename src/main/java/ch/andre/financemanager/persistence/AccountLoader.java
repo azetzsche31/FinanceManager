@@ -1,9 +1,12 @@
 package ch.andre.financemanager.persistence;
 
 import ch.andre.financemanager.model.Account;
+import ch.andre.financemanager.model.AccountType;
 import ch.andre.financemanager.model.Transaction;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,5 +38,27 @@ public class AccountLoader {
         account.addTransactions(transactions);
 
         return account;
+    }
+
+    public Account loadOrCreateDefaultAccount() throws SQLException {
+
+        Account account =
+                accountRepository.findFirst();
+
+        if (account != null) {
+        return loadAccount(account.getId());
+        }
+
+        Account newAccount = new Account(
+                "Privatkonto",
+                AccountType.CHECKING,
+                BigDecimal.ZERO,
+                Currency.getInstance("CHF")
+        );
+
+        accountRepository.save(newAccount);
+
+        return newAccount;
+
     }
 }

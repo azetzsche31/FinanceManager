@@ -99,4 +99,51 @@ public class AccountRepository {
         }
         return null;
     }
+
+    public Account findFirst() throws SQLException {
+
+        String sql = """
+                SELECT *
+                FROM accounts
+                LIMIT 1
+                """;
+        try(Connection connection = databaseManager.getConnection();
+            PreparedStatement statement =
+                    connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next()) {
+
+                UUID loadedId = UUID.fromString(
+                        resultSet.getString("id")
+                );
+
+                String name =
+                        resultSet.getString("name");
+
+                AccountType type =
+                        AccountType.valueOf(
+                                resultSet.getString("type")
+                        );
+
+                BigDecimal openingBalance =
+                        resultSet.getBigDecimal("opening_balance");
+
+                Currency currency =
+                        Currency.getInstance(
+                                resultSet.getString("currency")
+                        );
+
+                return new Account(
+                        loadedId,
+                        name,
+                        type,
+                        openingBalance,
+                        currency
+                );
+            }
+        }
+
+        return null;
+    }
 }
