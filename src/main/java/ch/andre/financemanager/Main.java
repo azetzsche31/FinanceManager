@@ -2,6 +2,10 @@ package ch.andre.financemanager;
 
 
 import ch.andre.financemanager.model.*;
+import ch.andre.financemanager.persistence.AccountLoader;
+import ch.andre.financemanager.persistence.AccountRepository;
+import ch.andre.financemanager.persistence.DatabaseManager;
+import ch.andre.financemanager.persistence.TransactionRepository;
 import ch.andre.financemanager.service.CsvExportService;
 import ch.andre.financemanager.service.CsvImportService;
 import ch.andre.financemanager.service.FinanceService;
@@ -9,9 +13,9 @@ import ch.andre.financemanager.service.FinanceService;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Currency;
 import java.util.Scanner;
 
 public class Main {
@@ -27,16 +31,39 @@ public class Main {
     private final CsvExportService csvExportService =
             new CsvExportService();
 
-    private final Account account = new Account(
-            "Privatkonto",
-            AccountType.CHECKING,
-            BigDecimal.ZERO,
-            Currency.getInstance("CHF")
-    );
+    private final Account account;
 
-    static void main(String[] args) {
-      Main application = new Main();
-      application.start();
+    private final AccountLoader accountLoader;
+
+    public Main(AccountLoader accountLoader) throws SQLException {
+        this.accountLoader = accountLoader;
+        this.account = accountLoader.loadOrCreateDefaultAccount();
+    }
+
+    static void main(String[] args) throws SQLException {
+
+        DatabaseManager databaseManager =
+                new DatabaseManager("finance-manager.db");
+
+        databaseManager.createAccountsTable();
+        databaseManager.createTransactionsTable();
+
+        AccountRepository accountRepository =
+                new AccountRepository(databaseManager);
+
+        TransactionRepository transactionRepository =
+                new TransactionRepository(databaseManager);
+
+        AccountLoader accountLoader =
+                new AccountLoader(
+                        accountRepository,
+                        transactionRepository
+                );
+
+        Main application =
+                new Main(accountLoader);
+
+        application.start();
     }
 
     private void start()  {
