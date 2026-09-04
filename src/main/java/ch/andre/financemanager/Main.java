@@ -35,9 +35,16 @@ public class Main {
 
     private final AccountLoader accountLoader;
 
-    public Main(AccountLoader accountLoader) throws SQLException {
+    private final TransactionRepository transactionRepository;
+
+    public Main(
+            AccountLoader accountLoader,
+            TransactionRepository transactionRepository
+    ) throws SQLException {
         this.accountLoader = accountLoader;
+        this.transactionRepository = transactionRepository;
         this.account = accountLoader.loadOrCreateDefaultAccount();
+
     }
 
     static void main(String[] args) throws SQLException {
@@ -61,12 +68,15 @@ public class Main {
                 );
 
         Main application =
-                new Main(accountLoader);
+                new Main(
+                        accountLoader,
+                        transactionRepository
+                );
 
         application.start();
     }
 
-    private void start()  {
+    private void start() throws SQLException {
         boolean running = true;
 
         while (running) {
@@ -162,7 +172,7 @@ public class Main {
     }
 
 
-    private void addTransaction() {
+    private void addTransaction() throws SQLException {
 
         System.out.println();
         System.out.println("===== Neue Transaktion =====");
@@ -184,18 +194,16 @@ public class Main {
 
         BigDecimal amount = new BigDecimal(amountInput);
 
-
-
-        Transaction transaction = new Transaction(
-                date,
-                amount,
-                description,
-                type,
-                category,
-                account
+        Transaction transaction =
+                createTransaction(
+                    date,
+                    amount,
+                    description,
+                    type,
+                    category
         );
 
-        account.addTransaction(transaction);
+        saveTransaction(transaction);
 
         System.out.println("Transaktion erfolgreich hinzugefügt.");
 
@@ -211,6 +219,29 @@ public class Main {
 
         System.out.println("-----------------------------------------");
 
+    }
+
+    Transaction createTransaction (
+            LocalDate date,
+            BigDecimal amount,
+            String description,
+            TransactionType type,
+            Category category
+    ) {
+        return new Transaction(
+                date,
+                amount,
+                description,
+                type,
+                category,
+                account
+        );
+    }
+
+    void saveTransaction(Transaction transaction) throws SQLException {
+
+        transactionRepository.save(transaction);
+        account.addTransaction(transaction);
     }
 
     private TransactionType readTransactionType() {
