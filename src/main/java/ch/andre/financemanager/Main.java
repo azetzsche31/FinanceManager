@@ -296,7 +296,7 @@ public class Main {
         }
     }
 
-    private void csvImport() {
+private void csvImport() throws SQLException{
 
         System.out.println();
         System.out.println("===== CSV Import =====");
@@ -306,29 +306,37 @@ public class Main {
 
         Path file = Path.of(path);
 
+        importTransaction(file);
+
+    }
+
+    CsvImportResult importTransaction(Path file) throws  SQLException{
+
         CsvImportResult result =
                 csvImportService.importTransactions(
                         file,
                         account
                 );
 
-        account.addTransactions(
-                result.getTransactions()
-        );
+        for (Transaction transaction : result.getTransactions()) {
+            saveTransaction(transaction);
+        }
 
         System.out.println();
-        System.out.println("CSV-Import abgeschlossen.");
+        System.out.println("CSV-Import abgeschlossen");
         System.out.println();
 
         System.out.println(
-                "Importierte Transaktionen: "
-                    + result.getImportedCount()
+                "Importierte Transactionen: "
+                + result.getImportedCount()
         );
 
         System.out.println(
                 "Fehler: "
-                    + result.getErrorCount()
+                + result.getErrorCount()
         );
+
+        return result;
     }
 
     private void csvExport() {

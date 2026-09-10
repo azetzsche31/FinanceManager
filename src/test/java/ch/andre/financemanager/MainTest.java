@@ -1,9 +1,6 @@
 package ch.andre.financemanager;
 
-import ch.andre.financemanager.model.Account;
-import ch.andre.financemanager.model.Category;
-import ch.andre.financemanager.model.Transaction;
-import ch.andre.financemanager.model.TransactionType;
+import ch.andre.financemanager.model.*;
 import ch.andre.financemanager.persistence.AccountLoader;
 import ch.andre.financemanager.persistence.AccountRepository;
 import ch.andre.financemanager.persistence.DatabaseManager;
@@ -168,9 +165,90 @@ public class MainTest {
                 transaction.getCategory(),
                 loadedTransaction.getCategory()
         );
+    }
 
+    @Test
+    void importedTransactionIsSavedToDatabase() throws SQLException {
 
+        Path databaseFile =
+                tempDirectory.resolve("finance-manager.db");
 
+        DatabaseManager databaseManager =
+                new DatabaseManager(databaseFile.toString());
+
+        databaseManager.createAccountsTable();
+        databaseManager.createTransactionsTable();
+
+        AccountRepository accountRepository =
+                new AccountRepository(databaseManager);
+
+        TransactionRepository transactionRepository =
+                new TransactionRepository(databaseManager);
+
+        AccountLoader accountLoader =
+                new AccountLoader(
+                        accountRepository,
+                        transactionRepository
+                );
+
+        Account account =
+                accountLoader.loadOrCreateDefaultAccount();
+
+        Main main =
+                new Main(
+                        accountLoader,
+                        transactionRepository
+                );
+
+        Path csvFile =
+                Path.of(
+                        "src/test/resources/csv/transaction-import.csv"
+                );
+
+        CsvImportResult result =
+                main.importTransaction(csvFile);
+
+        Transaction importedTransaction =
+                result.getTransactions().get(0);
+
+        Transaction loadedTransaction =
+                transactionRepository.findById(
+                        importedTransaction.getId(),
+                        account
+                );
+
+        assertNotNull(loadedTransaction);
+
+        assertEquals(
+                importedTransaction.getId(),
+                loadedTransaction.getId()
+        );
+
+        assertEquals(
+                importedTransaction.getDate(),
+                loadedTransaction.getDate()
+        );
+
+        assertEquals(
+                0,
+                importedTransaction.getAmount()
+                        .compareTo(loadedTransaction.getAmount())
+        );
+
+        assertEquals(
+                importedTransaction.getDescription(),
+                loadedTransaction.getDescription()
+        );
+
+        assertEquals(
+                importedTransaction.getType(),
+                loadedTransaction.getType()
+        );
+
+        assertEquals(
+                importedTransaction.getCategory(),
+                loadedTransaction.getCategory()
+        );
 
     }
 }
