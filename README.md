@@ -262,12 +262,85 @@ Main
      └── weitere Modelle
 ```
 
+## Datenbank
+
+Die Anwendung verwendet ***SQLite*** zur persistenten Speicherung der Finanzdaten.
+
+Aktuell werden folgende Daten gespeichert:
+
+### **Accounts**
+
+- ID
+- Name
+- Kontotyp
+- Eröffnungssaldo
+- Währung
+
+### **Transactions**
+
+- ID
+- Konto
+- Datum
+- Betrag
+- Beschreibung
+- Transaktionstyp
+- Kategorie
+
+Die Datenbank wird beim Start der Anwendung geladen bzw. der Default-Account wird bei Bedarf automatisch angelegt.
+
+## CSV-Format
+
+Der CSV-Import und -Export verwendet Semikolon als Trennzeichen.
+
+Beispiel
+
+```text
+
+date;amount;description;type;category
+2026-07-01;5000.00;Lohn;INCOME;SALARY
+2026-07-05;2500;Miete;EXPENSE;HOUSING
+
+```
+
+CSV-Werte mit Semikolon oder Anführungszeichen werden entsprechend den CSV-Regeln maskiert.
+
+Beispiel
+
+```text
+
+2026-07-10;45.50;"Restaurant; Abendessen";EXPENSE;GROCERIES
+2026-07-10;45.50;"Restaurant ""Abendessen""";EXPENSE;GROCERIES
+```
+
+## Test-DRiven Development
+
+Das Projekt wird schrittweise nach dem **TDD-Prinzip** entwickelt:
+
+```text
+Test schreiben
+      ↓
+Test schlägt fehl
+      ↓
+Implementierung
+      ↓
+Test wird grün
+      ↓
+Refactoring
+      ↓
+Nächste Funktion
+
+```
+Dabei werden sowohl einzelne Services und Modelle als auch die Zusammenarbeit
+zwischen Anwendung, CSV-Verarbeitung und SQLite getestet.
+
 ## Nächste Entwicklungsschritte
-1.  Architektur für die Benutzeroberfläche vorbereiten
-2. JavaFX-Benutzeroberfläche entwickeln
-3. Hauptfenster und Navigation erstellen
-4. Konten- und Transaktionsübersicht als UI umsetzen
-5. Dashboard und Finanzübersicht visualisieren
+1. Architektur für die Benutzeroberfläche vorbereiten
+2. JavaFX in das Maven-Projekt integrieren
+3. JavaFX-Anwendung als separaten UI-Einstiegspunkt aufbauen
+4. Hauptfenster und Navigation erstellen 
+5. Konten- und Transaktionsübersicht als UI umsetzen 
+6. Dashboard und Finanzübersicht visualisieren
+7. Diagramme und weitere Visualisierungen hinzufügen
 
 ## Autor
 Andreas
