@@ -27,7 +27,11 @@ Das Projekt dient dazu, moderne Java-Entwicklung mit objektorientiertem Design, 
 
 🔧 **Version 1.1 in Entwicklung**
 
-Die Anwendung verfügt inzwischen über eine SQLite-basierte Persistenz für Konten und Transaktionen. Die Konsolenanwendung verwendet beim Start einen persistenten Default-Account und kann Transaktionen dauerhaft in der Datenbank speichern und wieder laden.
+Die Anwendung verfügt inzwischen über eine SQLite-basierte Persistenz für Konten und Transaktionen.
+
+Die Konsolenanwendung verwendet beim Start einen persistenten Default-Account und kann Transaktionen dauerhaft in der Datenbank speichern und wieder laden.
+
+Zusätzlich stehen CSV-Import und CSV-Export sowie Monats- und Jahresberichte zur Verfügung.
 
 Die Entwicklung erfolgt schrittweise nach dem **Test-Driven-Development-Prinzip**.
 
@@ -39,18 +43,23 @@ Die Entwicklung erfolgt schrittweise nach dem **Test-Driven-Development-Prinzip*
 * Einnahmen und Ausgaben erfassen
 * Kontostand berechnen
 * Transaktionen anzeigen
+* Einnahmen berechnen
+* Ausgaben berechnen
+* Auswertungen nach Kategorie
 * Monatsberichte erstellen
 * Jahresberichte erstellen
-* Auswertungen nach Kategorie
+* Nettoergebnis berechnen
 
 ### CSV
 
 * CSV-Import
 * Validierung der importierten Daten
 * Fehlerprotokoll beim Import
+* Persistenter CSV-Import in die SQLite-Datenbank
 * CSV-Export
 * Roundtrip-Test (CSV-Export → CSV-Import)
-* Unterstützung für Sonderzeichen in CSV-Dateien
+* Unterstützung für Semikolon in CSV-Werten
+* Unterstützung für Anführungszeichen in CSV-Werten
 
 ### Persistenz
 
@@ -62,7 +71,18 @@ Die Entwicklung erfolgt schrittweise nach dem **Test-Driven-Development-Prinzip*
 * `AccountLoader` zum Laden bzw. Erzeugen des Default-Accounts
 * Transaktionen können über die Anwendung in SQLite gespeichert werden
 * Gespeicherte Transaktionen können wieder aus SQLite geladen werden
+* Importierte CSV-Transaktionen werden persistent gespeichert
 * Persistenz durch Integrationstests abgesichert
+
+### Berichte und Auswertungen
+
+* Monatsberichte
+* Jahresberichte
+* Einnahmen nach Zeitraum
+* Ausgaben nach Zeitraum
+* Nettoergebnis nach Zeitraum
+* Ausgaben nach Kategorie
+* Berichte für Zeiträume ohne Transaktionen
 
 ### Anwendung
 
@@ -70,15 +90,18 @@ Die Entwicklung erfolgt schrittweise nach dem **Test-Driven-Development-Prinzip*
 * Transaktionen über die Anwendung erfassen
 * Kontostand nach dem Erfassen einer Transaktion anzeigen
 * Persistente Daten beim Programmstart laden
+* CSV-Import über das Menü
+* CSV-Export über das Menü
 
 ## Geplante Funktionen
 
-* Persistenter CSV-Import
 * JavaFX-Benutzeroberfläche
-* Budgetplanung
-* Sparziele
+* Dashboard
+* Finanzübersichten visualisieren
 * Diagramme
 * Such- und Filterfunktionen
+* Budgetplanung
+* Sparziele
 * Erweiterte Auswertungen
 * Mehrere Konten komfortabel verwalten
 
@@ -132,7 +155,12 @@ Die Entwicklung erfolgt schrittweise nach dem **Test-Driven-Development-Prinzip*
 * Persistenter Default-Account
 * Transaktionen über `Main` in SQLite speichern
 * Transaktionen aus SQLite laden
+* CSV-Import persistent in SQLite speichern
+* Monats- und Jahresberichte erweitert
+* Nettoergebnis berechnen
+* Ausgaben nach Kategorie auswerten
 * Persistenztests mit JUnit
+* Integrationstests für CSV und Persistenz
 * TDD-basierte Weiterentwicklung
 
 ## Qualität
@@ -142,13 +170,18 @@ Die Entwicklung erfolgt schrittweise nach dem **Test-Driven-Development-Prinzip*
 Aktuell eingesetzt:
 
 * Unit-Tests mit JUnit 5
-* Integrationstests für CSV-Import und CSV-Export
-* Persistenztests für SQLite
 * Tests für `FinanceService`
+* Tests für Monats- und Jahresberichte
+* Tests für Auswertungen nach Kategorie
+* Tests für CSV-Import
+* Tests für CSV-Export
+* Tests für CSV-Sonderzeichen
+* Roundtrip-Tests für CSV-Export und CSV-Import
+* Persistenztests für SQLite
 * Tests für `AccountRepository`
 * Tests für `TransactionRepository`
 * Tests für `AccountLoader`
-* Tests für die Integration von `Main` und der Persistenz
+* Integrationstests für die Kombination aus Anwendung und Persistenz
 
 Ziel ist es, neue Funktionen zunächst durch Tests abzusichern und anschließend die Implementierung weiterzuentwickeln.
 
@@ -203,12 +236,9 @@ src/
     │
     └── resources/
         └── csv/
+            └── transaction-import.csv
 ```
-
 ## Architektur
-
-Die Anwendung ist in mehrere Bereiche aufgeteilt:
-
 ```text
 Main
  │
@@ -226,20 +256,19 @@ Main
  └── Domain Model
      ├── Account
      ├── Transaction
+     ├── MonthlyReport
+     ├── YearlyReport
      ├── Category
      └── weitere Modelle
 ```
 
-Die Trennung der Verantwortlichkeiten soll die Anwendung testbar und langfristig erweiterbar halten.
-
 ## Nächste Entwicklungsschritte
-
-1. CSV-Import ebenfalls persistent speichern
-2. Persistenz weiter durch Tests absichern
-3. Architektur für die Benutzeroberfläche vorbereiten
-4. JavaFX-Benutzeroberfläche entwickeln
-5. Dashboard und Finanzübersichten visualisieren
+1.  Architektur für die Benutzeroberfläche vorbereiten
+2. JavaFX-Benutzeroberfläche entwickeln
+3. Hauptfenster und Navigation erstellen
+4. Konten- und Transaktionsübersicht als UI umsetzen
+5. Dashboard und Finanzübersicht visualisieren
 
 ## Autor
-
 Andreas
+
