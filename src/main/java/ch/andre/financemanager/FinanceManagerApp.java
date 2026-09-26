@@ -1,6 +1,7 @@
 package ch.andre.financemanager;
 
 import ch.andre.financemanager.model.AccountType;
+import ch.andre.financemanager.model.Transaction;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -66,11 +67,33 @@ public class FinanceManagerApp extends Application{
                 balance + " " + account.getCurrency().getCurrencyCode()
         );
 
+        Label transactionTitle = new Label("Transaktionen");
+        transactionTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        VBox transactionBox = new VBox(5);
+
+        for (Transaction transaction : account.getTransactions()) {
+            Label transactionLabel = new Label(
+                    transaction.getDate()
+                    + " | "
+                    + transaction.getDescription()
+                    + " | "
+                    + transaction.getSignedAmount()
+                    + " | "
+                    + account.getCurrency().getCurrencyCode()
+            );
+
+            transactionBox.getChildren().add(transactionLabel);
+        }
+
         VBox balanceBox = new VBox(10);
         balanceBox.getChildren().addAll(
                 balanceTitle,
-                balanceValue
+                balanceValue,
+                transactionTitle,
+                transactionBox
         );
+
         balanceBox.setPadding(new Insets(20));
 
         root.setCenter(balanceBox);
