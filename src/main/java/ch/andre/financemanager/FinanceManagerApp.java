@@ -59,7 +59,7 @@ public class FinanceManagerApp extends Application {
         BorderPane root = new BorderPane();
 
         // Header
-        Label titleLabel = new Label("Finanace Manager");
+        Label titleLabel = new Label("Finance Manager");
 
         titleLabel.setStyle(
                 "-fx-font-size: 24px; -fx-font-weight: bold;"
@@ -91,27 +91,68 @@ public class FinanceManagerApp extends Application {
                 "-fx-font-size: 18px; -fx-font-weigth: bold;"
         );
 
+        VBox transactionBox = new VBox(5);
+
         // Button zum Erfassen einer Transaktion
         Button addTransactionButton =
                 new Button("Transaktion hinzufügen");
 
         addTransactionButton.setOnAction(event -> {
 
-            Optional<Transaction> result =
-                    showTransactionDialog(account);
+                    Optional<Transaction> result =
+                            showTransactionDialog(account);
 
-            result.ifPresent(transaction ->
-                    System.out.println(
-                            "Neue Transaktion: "
-                            + transaction.getDescription()
-                            + " | "
-                            + transaction.getSignedAmount()
-                    )
-            );
-        });
+                    result.ifPresent(transaction -> {
+                        try {
+                            transactionRepository.save(transaction);
+                            account.addTransaction(transaction);
+
+                            Label transactionLable = new Label(
+                                    transaction.getDate()
+                                    + " | "
+                                    + transaction.getDescription()
+                                    + " | "
+                                    + transaction.getSignedAmount()
+                                    + " | "
+                                    + account.getCurrency().getCurrencyCode()
+                            );
+
+                            transactionBox.getChildren().add(transactionLable);
+
+                            BigDecimal newBalance =
+                                    financeService.calculateBalance(account);
+
+                            balanceValue.setText(
+                                    newBalance
+                                    + " "
+                                    + account.getCurrency().getCurrencyCode()
+                            );
+
+                            System.out.println(
+                                    "Transaktion gespeichert: "
+                                            + transaction.getDescription()
+                                            + " | "
+                                            + transaction.getSignedAmount()
+                            );
+                        } catch (SQLException exception) {
+                            Alert alert =
+                                    new Alert(Alert.AlertType.ERROR);
+
+                            alert.setTitle("Fehler");
+                            alert.setHeaderText(
+                                    "Transaktion konnte nicht gespeichert werden"
+                            );
+                            alert.setContentText(
+                                    exception.getMessage()
+                            );
+
+                            alert.showAndWait();
+                        }
+                    });
+                });
 
         // Vorhandene Transaktionen anzeigen
-        VBox transactionBox = new VBox(5);
+
 
         for (Transaction transaction : account.getTransactions()) {
 
