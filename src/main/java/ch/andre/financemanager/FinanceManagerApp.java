@@ -1,10 +1,6 @@
 package ch.andre.financemanager;
 
-import ch.andre.financemanager.model.Account;
-import ch.andre.financemanager.model.Category;
-import ch.andre.financemanager.model.Transaction;
-import ch.andre.financemanager.model.TransactionType;
-import ch.andre.financemanager.persistence.AccountLoader;
+import ch.andre.financemanager.model.*;
 import ch.andre.financemanager.persistence.AccountRepository;
 import ch.andre.financemanager.persistence.DatabaseManager;
 import ch.andre.financemanager.persistence.TransactionRepository;
@@ -24,6 +20,8 @@ import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Currency;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -46,14 +44,78 @@ public class FinanceManagerApp extends Application {
         TransactionRepository transactionRepository =
                 new TransactionRepository(databaseManager);
 
-        AccountLoader accountLoader =
-                new AccountLoader(
-                        accountRepository,
-                        transactionRepository
-                );
 
-        Account account =
-                accountLoader.loadOrCreateDefaultAccount();
+        List<Account> accounts =
+                accountRepository.findAll();
+
+        for (Account loadedAccount : accounts) {
+
+            List<Transaction> transactions =
+                    transactionRepository.findByAccount(
+                            loadedAccount
+                    );
+
+            loadedAccount.addTransactions(
+                    transactions
+            );
+        }
+
+        ComboBox<Account> accountComboBox =
+                new ComboBox<>();
+
+        accountComboBox.getItems().addAll(accounts);
+
+        if (!accounts.isEmpty()) {
+            accountComboBox.setValue(
+                    accounts.getFirst()
+            );
+        }
+
+        accountComboBox.setCellFactory(accountListView ->
+                new ListCell<>() {
+
+                    @Override
+                    protected void updateItem(
+                            Account item,
+                            boolean empty
+                    ) {
+                        super.updateItem(item, empty);
+
+                        if (empty || item == null) {
+                            setText(null);
+                        } else  {
+                            setText(item.getName());
+                        }
+                    }
+                }
+        );
+
+        accountComboBox.setButtonCell(
+                new ListCell<>() {
+
+                    @Override
+                    protected void updateItem(
+                            Account item,
+                            boolean empty
+                    ) {
+                        super.updateItem(item, empty);
+
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(item.getName());
+                        }
+                    }
+                }
+        );
+
+        HBox accountSelectionBox =
+                new HBox(10);
+
+        accountSelectionBox.getChildren().addAll(
+                new Label("Konto: "),
+                accountComboBox
+        );
 
         // Hauptlayout
         BorderPane root = new BorderPane();
@@ -74,14 +136,29 @@ public class FinanceManagerApp extends Application {
         // Kontostand
         Label balanceTitle = new Label("Kontostand");
 
-        BigDecimal balanace =
-                financeService.calculateBalance(account);
+        Account initialAccount =
+                accountComboBox.getValue();
 
-        Label balanceValue = new Label(
-                balanace
+        Label balanceValue =
+                new Label("Noch kein Konto vorhanden");
+
+        if (initialAccount != null) {
+
+            BigDecimal balance =
+                    financeService.calculateBalance(
+                            initialAccount
+                    );
+
+            balanceValue.setText(
+                    balance
                             + " "
-                            + account.getCurrency().getCurrencyCode()
-        );
+                            + initialAccount
+                                .getCurrency()
+                                .getCurrencyCode()
+            );
+        }
+
+
 
         // Transaktionen
         Label transactionTitle =
@@ -91,7 +168,66 @@ public class FinanceManagerApp extends Application {
                 "-fx-font-size: 18px; -fx-font-weigth: bold;"
         );
 
+        // Button zum Erfassen eines Kontos
+
+        Button addAccountButton =
+                new Button("Neues Konto");
+
+        addAccountButton.setOnAction(event -> {
+
+            Optional<Account> result =
+                    showAccountDialog();
+
+            result.ifPresent(newAccount -> {
+                try {
+                    accountRepository.save(newAccount);
+
+                    accountComboBox
+                            .getItems()
+                            .add(newAccount);
+
+                    accountComboBox.setValue(newAccount);
+
+                    System.out.println(
+                            "Konto gespeichert: "
+                            + newAccount.getName()
+                    );
+                } catch (SQLException exception) {
+
+                    Alert alert =
+                            new Alert(Alert.AlertType.ERROR);
+
+                    alert.setTitle("Fehler");
+                    alert.setHeaderText(
+                            "Konto konnte nicht gespeichert werden."
+                    );
+                    alert.setContentText(
+                            exception.getMessage()
+                    );
+
+                    alert.showAndWait();
+                }
+            });
+        });
+
         VBox transactionBox = new VBox(5);
+
+        accountComboBox.setOnAction(event -> {
+
+            Account selectedAccount =
+                    accountComboBox.getValue();
+
+            if (selectedAccount == null) {
+                return;
+            }
+
+            updateDashboard(
+                    selectedAccount,
+                    balanceValue,
+                    transactionBox,
+                    financeService
+            );
+        });
 
         // Button zum Erfassen einer Transaktion
         Button addTransactionButton =
@@ -99,33 +235,33 @@ public class FinanceManagerApp extends Application {
 
         addTransactionButton.setOnAction(event -> {
 
+            Account selectedAccount =
+                    accountComboBox.getValue();
+
+            if (selectedAccount == null) {
+                return;
+            }
+
                     Optional<Transaction> result =
-                            showTransactionDialog(account);
+                            showTransactionDialog(selectedAccount);
 
                     result.ifPresent(transaction -> {
                         try {
                             transactionRepository.save(transaction);
-                            account.addTransaction(transaction);
+                            selectedAccount.addTransaction(transaction);
 
-                            Label transactionLable = new Label(
-                                    transaction.getDate()
-                                    + " | "
-                                    + transaction.getDescription()
-                                    + " | "
-                                    + transaction.getSignedAmount()
-                                    + " | "
-                                    + account.getCurrency().getCurrencyCode()
-                            );
+                           Label transactionLable =
+                                   createTransactionLabel(transaction, selectedAccount);
 
                             transactionBox.getChildren().add(transactionLable);
 
                             BigDecimal newBalance =
-                                    financeService.calculateBalance(account);
+                                    financeService.calculateBalance(selectedAccount);
 
                             balanceValue.setText(
                                     newBalance
                                     + " "
-                                    + account.getCurrency().getCurrencyCode()
+                                    + selectedAccount.getCurrency().getCurrencyCode()
                             );
 
                             System.out.println(
@@ -153,30 +289,31 @@ public class FinanceManagerApp extends Application {
 
         // Vorhandene Transaktionen anzeigen
 
+        if (initialAccount != null) {
 
-        for (Transaction transaction : account.getTransactions()) {
+            for (Transaction transaction
+                    : initialAccount.getTransactions()) {
 
-            Label transactionLabel = new Label(
-                    transaction.getDate()
-                    + " | "
-                    + transaction.getDescription()
-                    + " | "
-                    + transaction.getSignedAmount()
-                    + " | "
-                    + account.getCurrency().getCurrencyCode()
-            );
+                Label transactionLabel =
+                        createTransactionLabel(
+                                transaction,
+                                initialAccount
+                        );
 
-            transactionBox
-                    .getChildren()
-                    .add(transactionLabel);
+                transactionBox
+                        .getChildren()
+                        .add(transactionLabel);
+            }
         }
 
         // Dashboard-Inhalt
         VBox balanceBox = new VBox(10);
 
         balanceBox.getChildren().addAll(
+                accountSelectionBox,
                 balanceTitle,
                 balanceValue,
+                addAccountButton,
                 addTransactionButton,
                 transactionTitle,
                 transactionBox
@@ -612,6 +749,225 @@ public class FinanceManagerApp extends Application {
         );
 
         return dialog.showAndWait();
+    }
+
+    private Optional<Account> showAccountDialog() {
+
+        Dialog<Account> dialog = new Dialog<>();
+
+        dialog.setTitle("Neues Konto");
+        dialog.setHeaderText("Konto erstellen");
+
+        ButtonType closeButtonType =
+                new ButtonType(
+                        "Schliessen",
+                        ButtonBar.ButtonData.CANCEL_CLOSE
+                );
+
+        ButtonType saveButtonType =
+                new ButtonType(
+                        "Speichern",
+                        ButtonBar.ButtonData.OK_DONE
+                );
+
+        dialog.getDialogPane()
+                .getButtonTypes()
+                .addAll(
+                        saveButtonType,
+                        closeButtonType
+                );
+
+        TextField nameField = new TextField();
+        nameField.setPromptText("z.B. Sparkonto");
+
+        ComboBox<AccountType> accountTypeComboBox =
+                new ComboBox<>();
+
+        accountTypeComboBox.getItems().addAll(
+                AccountType.values()
+        );
+
+        accountTypeComboBox.setPromptText(
+                "Kontotyp auswählen"
+        );
+
+        TextField openingBalanceField =
+                new TextField();
+
+        openingBalanceField.setPromptText(
+                "z.B. 10000.00"
+        );
+
+        TextField currencyField =
+                new TextField("CHF");
+
+        GridPane form = new GridPane();
+
+        form.setHgap(10);
+        form.setVgap(10);
+        form.setPadding(new Insets(20));
+
+
+
+        form.add(new Label("Name: "), 0, 0);
+        form.add(nameField, 1,0);
+
+        form.add(new Label("Kontotyp: "), 0, 1);
+        form.add(accountTypeComboBox, 1,1);
+
+        form.add(new Label("Anfangssaldo"), 0,2);
+        form.add(openingBalanceField, 1, 2);
+
+        form.add(new Label("Währung: "), 0,3);
+        form.add(currencyField, 1, 3);
+
+        dialog.getDialogPane().setContent(form);
+
+        Button saveButton =
+                (Button) dialog.getDialogPane()
+                                .lookupButton(saveButtonType);
+
+        saveButton.addEventFilter(
+                ActionEvent.ACTION,
+                event -> {
+
+                    String errorMessage = null;
+
+                    if (nameField.getText() == null
+                        || nameField.getText().isBlank()) {
+
+                        errorMessage =
+                                "Bitte einen Kontonamen eingeben.";
+                    } else if (accountTypeComboBox.getValue() == null) {
+
+                        errorMessage =
+                                "Bitte einen Kontotyp auswählen.";
+                    } else if (openingBalanceField.getText() == null
+                            || openingBalanceField.getText().isBlank()) {
+
+                        errorMessage =
+                                "Bitte einen Anfangssaldo eingeben.";
+                    } else {
+
+                        try {
+                            new BigDecimal(
+                                    openingBalanceField
+                                            .getText()
+                                            .trim()
+                            );
+                        } catch (NumberFormatException exception) {
+                            errorMessage =
+                                    "Der Anfangssaldo muss eine gültige Zahl sein.";
+                        }
+                    }
+
+                    if (errorMessage == null) {
+
+                        if (currencyField.getText() == null
+                                || currencyField.getText().isBlank()) {
+
+                            errorMessage =
+                                    "Bitte eine Währung eingeben.";
+                        } else {
+
+                            try {
+                                Currency.getInstance(
+                                        currencyField
+                                                .getText()
+                                                .trim()
+                                                .toUpperCase()
+                                );
+                            } catch (IllegalArgumentException exception) {
+                                errorMessage =
+                                        "Bitte einen gültigen Währungscode eingeben z.B. CHF.";
+                            }
+                        }
+                    }
+
+                    if (errorMessage != null) {
+
+                        Alert alert =
+                                new Alert(Alert.AlertType.ERROR);
+
+                        alert.setTitle("Ungültige Eingabe");
+                        alert.setHeaderText(
+                                "Konto kann nicht erstellt werden"
+                        );
+                        alert.setContentText(errorMessage);
+
+                        alert.showAndWait();
+
+                        event.consume();
+                    }
+                }
+        );
+
+
+        dialog.setResultConverter(buttonType -> {
+
+            if (buttonType == saveButtonType) {
+
+                return new Account(
+                        nameField.getText(),
+                        accountTypeComboBox.getValue(),
+                        new BigDecimal(
+                                openingBalanceField.getText()
+                        ),
+                        Currency.getInstance(
+                                currencyField.getText()
+                                        .trim()
+                                        .toUpperCase()
+                        )
+                );
+            }
+
+            return null;
+        });
+
+        return dialog.showAndWait();
+    }
+
+    private Label createTransactionLabel(
+            Transaction transaction,
+            Account account
+    ) {
+        return new Label(
+                transaction.getDate()
+                + " | "
+                + transaction.getDescription()
+                + " | "
+                + transaction.getSignedAmount()
+                + " | "
+                + account.getCurrency().getCurrencyCode()
+        );
+    }
+
+    private void updateDashboard(
+            Account account,
+            Label balanceValue,
+            VBox transactionBox,
+            FinanceService financeService
+    ) {
+        BigDecimal balance =
+                financeService.calculateBalance(account);
+
+        balanceValue.setText(
+                balance
+                        + " "
+                        + account.getCurrency().getCurrencyCode()
+        );
+
+        transactionBox.getChildren().clear();
+
+        for (Transaction transaction
+                : account.getTransactions()) {
+            transactionBox.getChildren().add(
+                    createTransactionLabel(
+                            transaction,
+                            account
+                    )
+            );
+        }
     }
 
     public static void main(String[] args) {

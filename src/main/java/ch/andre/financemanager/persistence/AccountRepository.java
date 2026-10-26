@@ -8,7 +8,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Currency;
+import java.util.List;
 import java.util.UUID;
 
 public class AccountRepository {
@@ -145,5 +147,51 @@ public class AccountRepository {
         }
 
         return null;
+    }
+
+    public List<Account> findAll() throws SQLException {
+
+        List<Account> accounts = new ArrayList<>();
+
+        String sql = """
+                SELECT id, name, type, opening_balance, currency
+                FROM accounts
+                ORDER BY rowid
+                """;
+
+        try (
+                Connection connection =
+                        databaseManager.getConnection();
+
+                PreparedStatement statement =
+                        connection.prepareStatement(sql);
+
+                ResultSet resultSet =
+                        statement.executeQuery()
+                ) {
+
+            while (resultSet.next()) {
+
+                Account account = new Account(
+                        UUID.fromString(
+                                resultSet.getString("id")
+                        ),
+                        resultSet.getString("name"),
+                        AccountType.valueOf(
+                                resultSet.getString("type")
+                        ),
+                        resultSet.getBigDecimal(
+                                "opening_balance"
+                        ),
+                        Currency.getInstance(
+                                resultSet.getString("currency")
+                        )
+                );
+
+                accounts.add(account);
+            }
+        }
+
+        return accounts;
     }
 }

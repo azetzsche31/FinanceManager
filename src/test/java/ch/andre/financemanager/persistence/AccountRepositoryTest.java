@@ -228,4 +228,56 @@ public class AccountRepositoryTest {
                         .getId()
         );
     }
+
+    @Test
+    void findAllReturnsAllSavedAccounts() throws SQLException {
+
+        Path databaseFile =
+                tempDirectory.resolve("finance-manager.db");
+
+        DatabaseManager databaseManager =
+                new DatabaseManager(databaseFile.toString());
+
+        databaseManager.createAccountsTable();;
+
+        AccountRepository accountRepository =
+                new AccountRepository(databaseManager);
+
+        Account checkingAccount = new Account(
+                "Privatkonto",
+                AccountType.CHECKING,
+                new BigDecimal("2500.00"),
+                Currency.getInstance("CHF")
+        );
+
+        Account savingsAccount = new Account(
+                "Sparkonto",
+                AccountType.SAVINGS,
+                new BigDecimal("10000.00"),
+                Currency.getInstance("CHF")
+        );
+
+        accountRepository.save(checkingAccount);
+        accountRepository.save(savingsAccount);
+
+        List<Account> accounts =
+                accountRepository.findAll();
+
+        assertEquals(
+                2,
+                accounts.size()
+        );
+
+        assertEquals(
+                checkingAccount.getId(),
+                accounts.get(0).getId()
+        );
+
+        assertEquals(
+                savingsAccount.getId(),
+                accounts.get(1).getId()
+        );
+
+
+    }
 }
