@@ -83,7 +83,7 @@ public class FinanceManagerApp extends Application {
 
                         if (empty || item == null) {
                             setText(null);
-                        } else  {
+                        } else {
                             setText(item.getName());
                         }
                     }
@@ -153,11 +153,10 @@ public class FinanceManagerApp extends Application {
                     balance
                             + " "
                             + initialAccount
-                                .getCurrency()
-                                .getCurrencyCode()
+                            .getCurrency()
+                            .getCurrencyCode()
             );
         }
-
 
 
         // Transaktionen
@@ -225,7 +224,8 @@ public class FinanceManagerApp extends Application {
                     selectedAccount,
                     balanceValue,
                     transactionBox,
-                    financeService
+                    financeService,
+                    transactionRepository
             );
         });
 
@@ -250,10 +250,19 @@ public class FinanceManagerApp extends Application {
                             transactionRepository.save(transaction);
                             selectedAccount.addTransaction(transaction);
 
-                           Label transactionLable =
-                                   createTransactionLabel(transaction, selectedAccount);
+                           HBox transactionRow =
+                                   createTransactionRow(
+                                           transaction,
+                                           selectedAccount,
+                                           transactionRepository,
+                                           balanceValue,
+                                           transactionBox,
+                                           financeService
+                                   );
 
-                            transactionBox.getChildren().add(transactionLable);
+                           transactionBox.getChildren().add(
+                                   transactionRow
+                           );
 
                             BigDecimal newBalance =
                                     financeService.calculateBalance(selectedAccount);
@@ -294,17 +303,20 @@ public class FinanceManagerApp extends Application {
             for (Transaction transaction
                     : initialAccount.getTransactions()) {
 
-                Label transactionLabel =
-                        createTransactionLabel(
+                HBox transactionRow =
+                        createTransactionRow(
                                 transaction,
-                                initialAccount
+                                initialAccount,
+                                transactionRepository,
+                                balanceValue,
+                                transactionBox,
+                                financeService
                         );
 
-                transactionBox
-                        .getChildren()
-                        .add(transactionLabel);
+                transactionBox.getChildren().add(transactionRow);
             }
         }
+
 
         // Dashboard-Inhalt
         VBox balanceBox = new VBox(10);
@@ -927,26 +939,100 @@ public class FinanceManagerApp extends Application {
         return dialog.showAndWait();
     }
 
-    private Label createTransactionLabel(
+    private HBox createTransactionRow(
             Transaction transaction,
-            Account account
+            Account account,
+            TransactionRepository transactionRepository,
+            Label balanceValue,
+            VBox transactionBox,
+            FinanceService financeService
+
     ) {
-        return new Label(
-                transaction.getDate()
-                + " | "
-                + transaction.getDescription()
-                + " | "
-                + transaction.getSignedAmount()
-                + " | "
-                + account.getCurrency().getCurrencyCode()
+
+        Label transactionLabel =
+                new Label(
+                        transaction.getDate()
+                        + " | "
+                        + transaction.getDescription()
+                        + " | "
+                        + transaction.getSignedAmount()
+                        + " | "
+                        + account.getCurrency().getCurrencyCode()
+                );
+
+        Button deleteButton =
+                new Button("Löschen");
+
+        deleteButton.setOnAction(event -> {
+
+            Alert confirmation =
+                    new Alert(
+                            Alert.AlertType.CONFIRMATION,
+                            "Möchtest du diese Transaktion wirklich löschen?",
+                            ButtonType.YES,
+                            ButtonType.NO
+                    );
+
+            confirmation.setTitle("Transaktion löschen");
+            confirmation.setHeaderText(
+                    transaction.getDescription()
+            );
+
+            Optional<ButtonType> result =
+                    confirmation.showAndWait();
+
+            if (result.isEmpty() || result.get() != ButtonType.YES) {
+                return;
+            }
+
+            try {
+                transactionRepository.delete(transaction);
+
+                account.removeTransaction(transaction);
+
+                updateDashboard(
+                        account,
+                        balanceValue,
+                        transactionBox,
+                        financeService,
+                        transactionRepository
+                );
+            } catch (SQLException exception) {
+
+                Alert alert =
+                        new Alert(Alert.AlertType.ERROR);
+
+                alert.setTitle("Fehler");
+
+                alert.setHeaderText(
+                        "Transaktion konnte nicht gelöscht werden"
+                );
+                alert.setContentText(
+                        exception.getMessage()
+                );
+
+                alert.showAndWait();
+            }
+        });
+
+
+        HBox transactionRow =
+                new HBox(10);
+
+        transactionRow.getChildren().addAll(
+                transactionLabel,
+                deleteButton
         );
+
+        return transactionRow;
     }
 
     private void updateDashboard(
             Account account,
             Label balanceValue,
             VBox transactionBox,
-            FinanceService financeService
+            FinanceService financeService,
+            TransactionRepository transactionRepository
     ) {
         BigDecimal balance =
                 financeService.calculateBalance(account);
@@ -961,10 +1047,15 @@ public class FinanceManagerApp extends Application {
 
         for (Transaction transaction
                 : account.getTransactions()) {
+
             transactionBox.getChildren().add(
-                    createTransactionLabel(
+                    createTransactionRow(
                             transaction,
-                            account
+                            account,
+                            transactionRepository,
+                            balanceValue,
+                            transactionBox,
+                            financeService
                     )
             );
         }

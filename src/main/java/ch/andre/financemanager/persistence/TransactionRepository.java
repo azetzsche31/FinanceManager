@@ -190,5 +190,25 @@ public class TransactionRepository {
 
     }
 
+    public void delete(Transaction transaction) throws SQLException {
+
+        String sql =
+                "DELETE FROM transactions WHERE id = ?";
+
+        try (Connection connection =
+                databaseManager.getConnection();
+
+            PreparedStatement statement =
+                connection.prepareStatement(sql)) {
+
+            statement.setString(
+                    1,
+                    transaction.getId().toString()
+            );
+
+            statement.executeUpdate();
+        }
+    }
+
 
 }

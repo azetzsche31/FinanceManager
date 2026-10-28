@@ -131,6 +131,11 @@ public class Account {
         }
     }
 
+    public void removeTransaction(Transaction transaction) {
+
+        transactions.remove(transaction);
+    }
+
     public List<Transaction> getTransactions() {
         return List.copyOf(transactions);
     }
