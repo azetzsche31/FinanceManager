@@ -324,4 +324,59 @@ void transactionCanBeLoaded() throws SQLException {
 
         assertNull(deletedTransaction);
     }
+
+    @Test
+    void transactionCanBeUpdated() throws SQLException {
+
+        Path databaseFile =
+                tempDirectory.resolve("finance-manager.db");
+
+        DatabaseManager databaseManager =
+                new DatabaseManager(databaseFile.toString());
+
+        databaseManager.createAccountsTable();
+        databaseManager.createTransactionsTable();
+
+        AccountRepository accountRepository =
+                new AccountRepository(databaseManager);
+
+        TransactionRepository transactionRepository =
+                new TransactionRepository(databaseManager);
+
+        Account account =
+                new Account(
+                        "Privatkonto",
+                        AccountType.CHECKING,
+                        new BigDecimal("2500.00"),
+                        Currency.getInstance("CHF")
+                );
+
+        Transaction transaction = new Transaction(
+                LocalDate.of(2026, 10, 28),
+                new BigDecimal("50.00"),
+                "Testausgabe",
+                TransactionType.EXPENSE,
+                Category.GROCERIES,
+                account
+        );
+
+        transactionRepository.save(transaction);
+
+        transaction.setDescription(
+                "Geänderte Testausgabe"
+        );
+
+        transactionRepository.update(transaction);
+
+        Transaction updatedTransacion =
+                transactionRepository.findById(
+                        transaction.getId(),
+                        account
+                );
+
+        assertEquals(
+                "Geänderte Testausgabe",
+                updatedTransacion.getDescription()
+        );
+    }
 }

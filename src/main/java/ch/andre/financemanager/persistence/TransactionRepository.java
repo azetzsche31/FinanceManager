@@ -210,5 +210,56 @@ public class TransactionRepository {
         }
     }
 
+    public void update(Transaction transaction) throws SQLException {
+
+        String sql =
+                "UPDATE transactions "
+                + "SET date = ?, "
+                + "amount = ?, "
+                + "description = ?, "
+                + "type = ?, "
+                + "category = ? "
+                + "WHERE id = ?";
+
+        try (Connection connection =
+                databaseManager.getConnection();
+
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setString(
+                    1,
+                    transaction.getDate().toString()
+            );
+            statement.setBigDecimal(
+                    2,
+                    transaction.getAmount()
+            );
+
+            statement.setString(
+                    3,
+                    transaction.getDescription()
+            );
+
+            statement.setString(
+                    4,
+                    transaction.getType().name()
+            );
+
+            statement.setString(
+                    5,
+                    transaction.getCategory().name()
+            );
+
+            statement.setString(
+                    6,
+                    transaction.getId().toString()
+            );
+
+            statement.executeUpdate();
+
+        }
+    }
+
 
 }

@@ -763,6 +763,441 @@ public class FinanceManagerApp extends Application {
         return dialog.showAndWait();
     }
 
+    private Optional<Transaction> showEditTransactionDialog(
+            Transaction transaction
+    ) {
+
+        Dialog<Transaction> dialog =
+                new Dialog<>();
+
+        dialog.setTitle("Transaktion bearbeiten");
+        dialog.setHeaderText("Transaktion bearbeiten");
+
+
+        // Button
+        ButtonType saveButtonType =
+                new ButtonType(
+                        "Speichern",
+                        ButtonBar.ButtonData.OK_DONE
+                );
+
+        ButtonType cancelButtonType =
+                new ButtonType(
+                        "Abbrechen",
+                        ButtonBar.ButtonData.CANCEL_CLOSE
+                );
+
+        dialog.getDialogPane()
+                .getButtonTypes()
+                .addAll(
+                        saveButtonType,
+                        cancelButtonType
+                );
+
+
+        // Datum
+        DatePicker datePicker =
+                new DatePicker();
+
+        datePicker.setValue(
+                transaction.getDate()
+        );
+
+
+        // Betrag
+        TextField amountField =
+                new TextField();
+
+        amountField.setText(
+                transaction.getAmount().toString()
+        );
+
+        // Beschreibung
+        TextField descriptionField =
+                new TextField();
+
+        descriptionField.setText(
+                transaction.getDescription()
+        );
+
+        // Transaktionstyp
+        ComboBox<TransactionType> typeComboBox =
+                new ComboBox<>();
+
+        typeComboBox.getItems().addAll(
+                TransactionType.INCOME,
+                TransactionType.EXPENSE
+        );
+
+        typeComboBox.setValue(
+                transaction.getType()
+        );
+
+        typeComboBox.setConverter(
+                new StringConverter<TransactionType>() {
+
+                    @Override
+                    public String toString(
+                            TransactionType type
+                    ) {
+
+                        if (type == null) {
+                            return "";
+                        }
+
+                        return switch (type) {
+                            case INCOME -> "Einnahme";
+                            case EXPENSE -> "Ausgabe";
+                        };
+                    }
+
+                    @Override
+                    public TransactionType fromString(
+                            String string
+                    ) {
+                        return null;
+                    }
+                }
+        );
+
+        // Kategorie
+        ComboBox<Category> categoryComboBox =
+                new ComboBox<>();
+
+        categoryComboBox.getItems().addAll(
+                Category.values()
+        );
+
+        categoryComboBox.setValue(
+                transaction.getCategory()
+        );
+
+        categoryComboBox.setConverter(
+                new StringConverter<Category>() {
+
+                    @Override
+                    public String toString(
+                            Category category
+                    ) {
+
+                        if(category == null) {
+                            return "";
+                        }
+
+                        return switch (category) {
+                            case SALARY -> "Lohn";
+                            case GROCERIES -> "Lebensmittel";
+                            case HOUSING -> "Wohnen";
+                            case TRANSPORT -> "Transport";
+                            case INSURANCE -> "Versicherung";
+                            case HEALTH -> "Gesundheit";
+                            case LEISURE -> "Freizeit";
+                            case SUBSCRIPTIONS -> "Abonnements";
+                            case TAXES -> "Steuern";
+                            case SAVINGS -> "Sparen";
+                            case OTHER -> "Sonstige";
+                        };
+                    }
+
+                    @Override
+                    public Category fromString(
+                            String string
+                    ) {
+                        return null;
+                    }
+                }
+        );
+
+        // Formular
+        GridPane form   =
+                new GridPane();
+
+        form.setHgap(10);
+        form.setVgap(10);
+        form.setPadding(new Insets(20));
+
+        form.add(
+                new Label("Datum:"),
+                0,
+                0
+        );
+
+        form.add(
+                datePicker,
+                1,
+                0
+        );
+
+        form.add(
+                new Label("Betrag"),
+                0,
+                1
+        );
+
+        form.add(
+                amountField,
+                1,
+                1
+        );
+
+        form.add(
+                new Label("Beschreibung"),
+                0,
+                2
+        );
+
+        form.add(
+                descriptionField,
+                1,
+                2
+        );
+
+        form.add(
+                new Label("Typ"),
+                0,
+                3
+        );
+
+        form.add(
+                typeComboBox,
+                1,
+                3
+        );
+
+        form.add(
+                new Label("Kategorie"),
+                0,
+                4
+        );
+
+        form.add(
+                categoryComboBox,
+                1,
+                4
+        );
+
+        dialog.getDialogPane()
+                .setContent(form);
+
+
+        // Transaction erzeugen
+        dialog.setResultConverter(buttonType -> {
+
+            if (buttonType == saveButtonType) {
+
+                BigDecimal amount =
+                        new BigDecimal(
+                                amountField.getText()
+                        );
+
+                transaction.setDate(
+                        datePicker.getValue()
+                );
+
+                transaction.setAmount(
+                        amount
+                );
+
+                transaction.setDescription(
+                        descriptionField.getText()
+                );
+
+                transaction.setType(
+                        typeComboBox.getValue()
+                );
+
+                transaction.setCategory(
+                        categoryComboBox.getValue()
+                );
+
+                return transaction;
+            }
+
+            return null;
+        });
+
+        // Speichern-Button für Validierung holen
+        Button saveButton =
+                (Button) dialog
+                        .getDialogPane()
+                        .lookupButton(saveButtonType);
+
+
+        // Eingaben validieren
+        saveButton.addEventFilter(
+                ActionEvent.ACTION,
+                saveEvent -> {
+
+                    // Datum
+                    if (datePicker.getValue() == null)  {
+
+                        Alert alert =
+                                new Alert(
+                                        Alert.AlertType.ERROR
+                                );
+
+                        alert.setTitle(
+                                "Ungültige Eingabe"
+                        );
+
+                        alert.setHeaderText(
+                                "Datum fehlt"
+                        );
+
+                        alert.setContentText(
+                                "Bitte wählen Sie ein Datum aus."
+                        );
+
+                        alert.showAndWait();
+
+                        saveEvent.consume();
+                        return;
+                    }
+
+                    // Beschreibung
+                    if (descriptionField
+                            .getText()
+                            .isBlank()) {
+
+                        Alert alert =
+                                new Alert(
+                                        Alert.AlertType.ERROR
+                                );
+
+                        alert.setTitle(
+                                "Ungültige Eingabe"
+                        );
+
+                        alert.setHeaderText(
+                                "Beschreibung fehlt"
+                        );
+
+                        alert.setContentText(
+                                "Bitte geben Sie eine Beschreibung ein."
+                        );
+
+                        alert.showAndWait();
+
+                        saveEvent.consume();
+                        return;
+                    }
+
+                    // Typ
+                    if (typeComboBox.getValue() == null) {
+
+                        Alert alert =
+                                new Alert(
+                                        Alert.AlertType.ERROR
+                                );
+
+                        alert.setTitle(
+                                "Ungültige Eingabe"
+                        );
+
+                        alert.setHeaderText(
+                                "Transaktiontyp fehlt"
+                        );
+
+                        alert.setContentText(
+                                "Bitte wählen Sie Einnahme oder Ausgabe aus."
+                        );
+
+                        alert.showAndWait();
+
+                        saveEvent.consume();
+                        return;
+                    }
+
+                    // Kategorie
+                    if (categoryComboBox.getValue() == null) {
+
+                        Alert alert =
+                                new Alert(
+                                        Alert.AlertType.ERROR
+                                );
+
+                        alert.setTitle(
+                                "Ungültige Eingabe"
+                        );
+
+                        alert.setHeaderText(
+                                "Kategorie fehlt"
+                        );
+
+                        alert.setContentText(
+                                "Bitte wählen Sie eine Kategorie aus."
+                        );
+
+                        alert.showAndWait();
+
+                        saveEvent.consume();
+                        return;
+                    }
+
+                    // Betrag
+                    BigDecimal amount;
+
+                    try {
+
+                        amount =
+                                new BigDecimal(
+                                        amountField.getText()
+                                );
+                    } catch (NumberFormatException exception) {
+
+                        Alert alert =
+                                new Alert(
+                                        Alert.AlertType.ERROR
+                                );
+
+                        alert.setTitle(
+                                "Ungültige Eingabe"
+                        );
+
+                        alert.setHeaderText(
+                                "Ungültige Betrag"
+                        );
+
+                        alert.setContentText(
+                                "Bitte geben Sie einen gültigen Betrag ein."
+                        );
+
+                        alert.showAndWait();
+
+                        saveEvent.consume();
+                        return;
+                    }
+
+                    if (amount.signum() <= 0) {
+
+                        Alert alert =
+                                new Alert(
+                                        Alert.AlertType.ERROR
+                                );
+
+                        alert.setTitle(
+                                "Ungültige Eingabe"
+                        );
+
+                        alert.setHeaderText(
+                                "Ungütiger Betrag"
+                        );
+
+                        alert.setContentText(
+                                "Der Betrag muss grösser als 0 sein."
+                        );
+
+                        alert.showAndWait();
+
+                        saveEvent.consume();
+                    }
+
+                }
+        );
+
+        return dialog.showAndWait();
+    }
+
     private Optional<Account> showAccountDialog() {
 
         Dialog<Account> dialog = new Dialog<>();
@@ -960,6 +1395,46 @@ public class FinanceManagerApp extends Application {
                         + account.getCurrency().getCurrencyCode()
                 );
 
+        Button editButton =
+                new Button("Bearbeiten");
+
+        editButton.setOnAction(event -> {
+
+            Optional<Transaction> result =
+                    showEditTransactionDialog(transaction);
+
+            result.ifPresent(updatedTransaction -> {
+
+                try {
+                    transactionRepository.update(
+                            updatedTransaction
+                    );
+
+                    updateDashboard(
+                            account,
+                            balanceValue,
+                            transactionBox,
+                            financeService,
+                            transactionRepository
+                    );
+                } catch (SQLException exception) {
+
+                    Alert alert =
+                            new Alert(Alert.AlertType.ERROR);
+
+                    alert.setTitle("Fehler");
+                    alert.setHeaderText(
+                            "Transaktion konnte nicht aktualisiert werden."
+                    );
+                    alert.setContentText(
+                            exception.getMessage()
+                    );
+
+                    alert.showAndWait();
+                }
+            });
+        });
+
         Button deleteButton =
                 new Button("Löschen");
 
@@ -1021,6 +1496,7 @@ public class FinanceManagerApp extends Application {
 
         transactionRow.getChildren().addAll(
                 transactionLabel,
+                editButton,
                 deleteButton
         );
 
