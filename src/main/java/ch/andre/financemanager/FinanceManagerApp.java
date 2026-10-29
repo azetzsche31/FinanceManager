@@ -990,27 +990,15 @@ public class FinanceManagerApp extends Application {
                                 amountField.getText()
                         );
 
-                transaction.setDate(
-                        datePicker.getValue()
-                );
-
-                transaction.setAmount(
-                        amount
-                );
-
-                transaction.setDescription(
-                        descriptionField.getText()
-                );
-
-                transaction.setType(
-                        typeComboBox.getValue()
-                );
-
-                transaction.setCategory(
-                        categoryComboBox.getValue()
-                );
-
-                return transaction;
+               return new Transaction(
+                       transaction.getId(),
+                       datePicker.getValue(),
+                       amount,
+                       descriptionField.getText(),
+                       typeComboBox.getValue(),
+                       categoryComboBox.getValue(),
+                       transaction.getAccount()
+               );
             }
 
             return null;
@@ -1408,6 +1396,26 @@ public class FinanceManagerApp extends Application {
                 try {
                     transactionRepository.update(
                             updatedTransaction
+                    );
+
+                    transaction.setDate(
+                            updatedTransaction.getDate()
+                    );
+
+                    transaction.setAmount(
+                            updatedTransaction.getAmount()
+                    );
+
+                    transaction.setDescription(
+                            updatedTransaction.getDescription()
+                    );
+
+                    transaction.setType(
+                            updatedTransaction.getType()
+                    );
+
+                    transaction.setCategory(
+                            updatedTransaction.getCategory()
                     );
 
                     updateDashboard(
