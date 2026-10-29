@@ -20,6 +20,8 @@ import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
@@ -149,13 +151,12 @@ public class FinanceManagerApp extends Application {
                             initialAccount
                     );
 
-            balanceValue.setText(
-                    balance
-                            + " "
-                            + initialAccount
-                            .getCurrency()
-                            .getCurrencyCode()
-            );
+           balanceValue.setText(
+                   formatAmount(
+                           balance,
+                           initialAccount.getCurrency()
+                   )
+           );
         }
 
 
@@ -209,6 +210,55 @@ public class FinanceManagerApp extends Application {
             });
         });
 
+        Label dateHeader =
+                new Label("Datum");
+
+        dateHeader.setPrefWidth(100);
+        dateHeader.setStyle(
+                "-fx-font-weight: bold;"
+        );
+
+        Label descriptionHeader =
+                new Label("Beschreibung");
+
+        descriptionHeader.setPrefWidth(280);
+        descriptionHeader.setStyle(
+                "-fx-font-weight: bold;"
+        );
+
+        Label amountHeader =
+                new Label("Betrag");
+
+        amountHeader.setPrefWidth(130);
+        amountHeader.setStyle(
+                "-fx-font-weight: bold; -fx-alignment: CENTER-RIGHT;"
+        );
+
+        Label actionHeader =
+                new Label("Aktionen");
+
+        actionHeader.setPrefWidth(150);
+        actionHeader.setStyle(
+                "-fx-font-weight: bold;"
+        );
+
+        HBox transactionHeader =
+                new HBox(10);
+
+        transactionHeader.setStyle(
+                "-fx-background-color: #f2f2f2;"
+                + "-fx-padding: 8 5 8 5;"
+                + "-fx-border-color: transparent transparent #cfcfcf transparent;"
+                + "-fx-border-width: 0 0 1 0;"
+        );
+
+        transactionHeader.getChildren().addAll(
+                dateHeader,
+                descriptionHeader,
+                amountHeader,
+                actionHeader
+        );
+
         VBox transactionBox = new VBox(5);
 
         accountComboBox.setOnAction(event -> {
@@ -250,28 +300,13 @@ public class FinanceManagerApp extends Application {
                             transactionRepository.save(transaction);
                             selectedAccount.addTransaction(transaction);
 
-                           HBox transactionRow =
-                                   createTransactionRow(
-                                           transaction,
-                                           selectedAccount,
-                                           transactionRepository,
-                                           balanceValue,
-                                           transactionBox,
-                                           financeService
-                                   );
-
-                           transactionBox.getChildren().add(
-                                   transactionRow
+                           updateDashboard(
+                                   selectedAccount,
+                                   balanceValue,
+                                   transactionBox,
+                                   financeService,
+                                   transactionRepository
                            );
-
-                            BigDecimal newBalance =
-                                    financeService.calculateBalance(selectedAccount);
-
-                            balanceValue.setText(
-                                    newBalance
-                                    + " "
-                                    + selectedAccount.getCurrency().getCurrencyCode()
-                            );
 
                             System.out.println(
                                     "Transaktion gespeichert: "
@@ -328,6 +363,7 @@ public class FinanceManagerApp extends Application {
                 addAccountButton,
                 addTransactionButton,
                 transactionTitle,
+                transactionHeader,
                 transactionBox
         );
 
@@ -1372,16 +1408,34 @@ public class FinanceManagerApp extends Application {
 
     ) {
 
-        Label transactionLabel =
+        Label dateLable =
                 new Label(
-                        transaction.getDate()
-                        + " | "
-                        + transaction.getDescription()
-                        + " | "
-                        + transaction.getSignedAmount()
-                        + " | "
-                        + account.getCurrency().getCurrencyCode()
+                        transaction.getDate().toString()
                 );
+
+        dateLable.setPrefWidth(100);
+
+        Label descriptionLabel =
+                new Label(
+                        transaction.getDescription()
+                );
+
+        descriptionLabel.setPrefWidth(280);
+
+        Label amountLabel =
+                new Label(
+                        formatAmount(
+                                transaction.getSignedAmount(),
+                                account.getCurrency()
+                        )
+                );
+
+        amountLabel.setPrefWidth(130);
+        amountLabel.setStyle(
+                "-fx-alignment: CENTER-RIGHT;"
+        );
+
+
 
         Button editButton =
                 new Button("Bearbeiten");
@@ -1502,8 +1556,16 @@ public class FinanceManagerApp extends Application {
         HBox transactionRow =
                 new HBox(10);
 
+        transactionRow.setStyle(
+                "-fx-padding: 8 5 8 5;"
+                + "-fx-border-color: transparent transparent #d9d9d9 transparent;"
+                + "-fx-border-width: 0 0 1 0;"
+        );
+
         transactionRow.getChildren().addAll(
-                transactionLabel,
+                dateLable,
+                descriptionLabel,
+                amountLabel,
                 editButton,
                 deleteButton
         );
@@ -1522,9 +1584,10 @@ public class FinanceManagerApp extends Application {
                 financeService.calculateBalance(account);
 
         balanceValue.setText(
-                balance
-                        + " "
-                        + account.getCurrency().getCurrencyCode()
+                formatAmount(
+                        balance,
+                        account.getCurrency()
+                )
         );
 
         transactionBox.getChildren().clear();
@@ -1544,6 +1607,30 @@ public class FinanceManagerApp extends Application {
             );
         }
     }
+
+    private String formatAmount(
+            BigDecimal amount,
+            Currency currency
+    ) {
+
+        DecimalFormatSymbols symbols =
+                new DecimalFormatSymbols();
+
+        symbols.setGroupingSeparator('\'');
+        symbols.setDecimalSeparator('.');
+
+        DecimalFormat format =
+                new DecimalFormat(
+                        "#,##0.00",
+                        symbols
+                );
+
+        return format.format(amount)
+                + " "
+                + currency.getCurrencyCode();
+    }
+
+
 
     public static void main(String[] args) {
         launch();
