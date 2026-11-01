@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Comparator;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
@@ -335,21 +336,13 @@ public class FinanceManagerApp extends Application {
 
         if (initialAccount != null) {
 
-            for (Transaction transaction
-                    : initialAccount.getTransactions()) {
-
-                HBox transactionRow =
-                        createTransactionRow(
-                                transaction,
-                                initialAccount,
-                                transactionRepository,
-                                balanceValue,
-                                transactionBox,
-                                financeService
-                        );
-
-                transactionBox.getChildren().add(transactionRow);
-            }
+            updateDashboard(
+                    initialAccount,
+                    balanceValue,
+                    transactionBox,
+                    financeService,
+                    transactionRepository
+            );
         }
 
 
@@ -1592,20 +1585,25 @@ public class FinanceManagerApp extends Application {
 
         transactionBox.getChildren().clear();
 
-        for (Transaction transaction
-                : account.getTransactions()) {
-
-            transactionBox.getChildren().add(
-                    createTransactionRow(
-                            transaction,
-                            account,
-                            transactionRepository,
-                            balanceValue,
-                            transactionBox,
-                            financeService
-                    )
-            );
-        }
+        account.getTransactions()
+                .stream()
+                .sorted(
+                        Comparator.comparing(
+                                Transaction::getDate
+                        ).reversed()
+                )
+                .forEach(transaction ->
+                        transactionBox.getChildren().add(
+                                createTransactionRow(
+                                        transaction,
+                                        account,
+                                        transactionRepository,
+                                        balanceValue,
+                                        transactionBox,
+                                        financeService
+                                )
+                        )
+                );
     }
 
     private String formatAmount(
