@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.time.Month;
+import java.time.YearMonth;
+
 
 public class FinanceService {
 
@@ -284,7 +286,75 @@ public class FinanceService {
         );
     }
 
+    public List<Transaction> getTransactionsForMonth(
+            Account account,
+            YearMonth month
+    ) {
 
+        return account.getTransactions()
+                .stream()
+                .filter(transaction ->
+                        YearMonth.from(
+                                transaction.getDate()
+                        ).equals(month)
+                )
+                .toList();
+    }
 
+    public BigDecimal calculateTotalIncomeForMonth(
+            Account account,
+            YearMonth month
+    ) {
+
+        return getTransactionsForMonth(account, month)
+                .stream()
+                .filter(transaction ->
+                        transaction.getType()
+                            == TransactionType.INCOME
+                )
+                .map(Transaction::getAmount)
+                .reduce(
+                        BigDecimal.ZERO,
+                        BigDecimal::add
+                );
+    }
+
+    public BigDecimal calculateTotalExpensesForMonth(
+            Account account,
+            YearMonth month
+    ) {
+
+        return getTransactionsForMonth(account, month)
+                .stream()
+                .filter(transaction ->
+                        transaction.getType()
+                        == TransactionType.EXPENSE
+                )
+                .map(Transaction::getAmount)
+                .reduce(
+                        BigDecimal.ZERO,
+                        BigDecimal::add
+                );
+    }
+
+    public BigDecimal calculateBalanceForMonth(
+            Account account,
+            YearMonth month
+    ) {
+
+        BigDecimal income =
+                calculateTotalIncomeForMonth(
+                        account,
+                        month
+                );
+
+        BigDecimal expenses =
+                calculateTotalExpensesForMonth(
+                        account,
+                        month
+                );
+
+        return income.subtract(expenses);
+    }
 
 }

@@ -11,7 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.YearMonth;
 import java.util.Currency;
+import java.util.List;
+import java.util.concurrent.atomic.LongAccumulator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -240,6 +243,221 @@ class FinanceServiceTest {
 
         assertEquals(
                 new BigDecimal("52.30"),
+                result
+        );
+    }
+
+    @Test
+    void shouldReturnTransactonsForMonth() {
+
+        Account account = new Account(
+                "Privatkonto",
+                AccountType.CHECKING,
+                new BigDecimal("2500.00"),
+                Currency.getInstance("CHF")
+        );
+
+        Transaction octoberTransaction =
+                new Transaction(
+                        LocalDate.of(2026, 10, 15),
+                        new BigDecimal("50.00"),
+                        "Oktober",
+                        TransactionType.EXPENSE,
+                        Category.GROCERIES,
+                        account
+                );
+
+        Transaction novemberTransaction =
+                new Transaction(
+                        LocalDate.of(2026, 11, 1),
+                        new BigDecimal("100.00"),
+                        "November",
+                        TransactionType.EXPENSE,
+                        Category.GROCERIES,
+                        account
+                );
+
+        account.addTransaction(octoberTransaction);
+        account.addTransaction(novemberTransaction);
+
+        FinanceService financeService =
+                new FinanceService();
+
+        List<Transaction> result =
+                financeService.getTransactionsForMonth(
+                        account,
+                        YearMonth.of(2026, 11)
+                );
+
+        assertEquals(1, result.size());
+        assertEquals(
+                novemberTransaction,
+                result.getFirst()
+        );
+    }
+
+    @Test
+    void shouldCalculateTotalIncomeForMonth() {
+
+        Account account = new Account(
+                "Privatkonto",
+                AccountType.CHECKING,
+                new BigDecimal("2500.00"),
+                Currency.getInstance("CHF")
+        );
+
+        Transaction octoberSalary =
+                new Transaction(
+                        LocalDate.of(2026, 10, 25),
+                        new BigDecimal("4000.00"),
+                        "Oktoberlohn",
+                        TransactionType.INCOME,
+                        Category.SALARY,
+                        account
+                );
+
+        Transaction novemberSalary =
+                new Transaction(
+                        LocalDate.of(2026, 11, 25),
+                        new BigDecimal("4200.00"),
+                        "Novemberlohn",
+                        TransactionType.INCOME,
+                        Category.SALARY,
+                        account
+                );
+
+        Transaction novemberGroceries =
+                new Transaction(
+                        LocalDate.of(2026, 11, 28),
+                        new BigDecimal("52.30"),
+                        "Lebensmittel",
+                        TransactionType.EXPENSE,
+                        Category.GROCERIES,
+                        account
+                );
+
+        account.addTransaction(octoberSalary);
+        account.addTransaction(novemberSalary);
+        account.addTransaction(novemberGroceries);
+
+        FinanceService financeService =
+                new FinanceService();
+
+        BigDecimal result =
+                financeService.calculateTotalIncomeForMonth(
+                        account,
+                        YearMonth.of(2026, 11)
+                );
+
+        assertEquals(
+                new BigDecimal("4200.00"),
+                result
+        );
+    }
+
+    @Test
+    void shouldCalculateTotalExpensesForMonth() {
+
+        Account account = new Account(
+                "Privatkonto",
+                AccountType.CHECKING,
+                new BigDecimal("2500.00"),
+                Currency.getInstance("CHF")
+        );
+
+        Transaction octoberGroceries =
+                new Transaction(
+                        LocalDate.of(2026, 10, 20),
+                        new BigDecimal("80.00"),
+                        "Oktober Lebensmittel",
+                        TransactionType.EXPENSE,
+                        Category.GROCERIES,
+                        account
+                );
+
+        Transaction novemberGroceries =
+                new Transaction(
+                        LocalDate.of(2026, 11, 5),
+                        new BigDecimal("52.30"),
+                        "November Lebenmittel",
+                        TransactionType.EXPENSE,
+                        Category.GROCERIES,
+                        account
+                );
+
+        Transaction novemberSalary =
+                new Transaction(
+                        LocalDate.of(2026, 11, 25),
+                        new BigDecimal("4200.00"),
+                        "Novemberlohn",
+                        TransactionType.INCOME,
+                        Category.SALARY,
+                        account
+                );
+
+        account.addTransaction(octoberGroceries);
+        account.addTransaction(novemberGroceries);
+        account.addTransaction(novemberSalary);
+
+        FinanceService financeService =
+                new FinanceService();
+
+        BigDecimal result =
+                financeService.calculateTotalExpensesForMonth(
+                        account,
+                        YearMonth.of(2026, 11)
+                );
+
+        assertEquals(
+                new BigDecimal("52.30"),
+                result
+        );
+    }
+
+    @Test
+    void shouldCalculateBalanceForMonth() {
+
+        Account account = new Account(
+                "Privatkonot",
+                AccountType.CHECKING,
+                new BigDecimal("2500.00"),
+                Currency.getInstance("CHF")
+        );
+
+        Transaction salary =
+                new Transaction(
+                        LocalDate.of(2026, 11, 25),
+                        new BigDecimal("4200.00"),
+                        "Novemberlohn",
+                        TransactionType.INCOME,
+                        Category.SALARY,
+                        account
+                );
+
+        Transaction groceries =
+                new Transaction(
+                        LocalDate.of(2026, 11, 28),
+                        new BigDecimal("52.30"),
+                        "Lebensmittel",
+                        TransactionType.EXPENSE,
+                        Category.GROCERIES,
+                        account
+                );
+
+        account.addTransaction(salary);
+        account.addTransaction(groceries);
+
+        FinanceService financeService =
+                new FinanceService();
+
+        BigDecimal result =
+                financeService.calculateBalanceForMonth(
+                        account,
+                        YearMonth.of(2026, 11)
+                );
+
+        assertEquals(
+                new BigDecimal("4147.70"),
                 result
         );
     }

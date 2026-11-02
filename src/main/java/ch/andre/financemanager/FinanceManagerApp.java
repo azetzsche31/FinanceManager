@@ -22,10 +22,9 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Comparator;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.time.YearMonth;
 
 
 public class FinanceManagerApp extends Application {
@@ -169,6 +168,125 @@ public class FinanceManagerApp extends Application {
                 "-fx-font-size: 18px; -fx-font-weigth: bold;"
         );
 
+        // Transaktionsfilter Monat
+
+        ComboBox<YearMonth> monthComboBox =
+                new ComboBox<>();
+
+        YearMonth currentMonth =
+                YearMonth.now();
+
+        for (int i = 0; i < 12; i++) {
+            monthComboBox.getItems().add(
+                    currentMonth.minusMonths(i)
+            );
+        }
+
+        monthComboBox.setValue(currentMonth);
+
+        DateTimeFormatter monthFormatter =
+                DateTimeFormatter.ofPattern(
+                        "MMMM yyyy",
+                        Locale.GERMAN
+                );
+
+        monthComboBox.setConverter(
+                new StringConverter<YearMonth>() {
+
+                    @Override
+                    public String toString(
+                            YearMonth yearMonth
+                    ) {
+                        if (yearMonth == null) {
+                            return "";
+                        }
+
+                        return monthFormatter.format(
+                                yearMonth
+                        );
+                    }
+
+                    @Override
+                    public YearMonth fromString(
+                            String string
+                    ) {
+                        return null;
+                    }
+                }
+        );
+
+        // Monatsübersicht
+
+        Label monthlyIncomeTitle =
+                new Label("Einnahmen");
+        monthlyIncomeTitle.setStyle(
+                "-fx-font-weight: bold;"
+        );
+
+        Label monthlyIncomeValue =
+                new Label("0.00 CHF");
+
+        Label monthlyExpensesTitle =
+                new Label("Ausgaben");
+        monthlyExpensesTitle.setStyle(
+                "-fx-font-weight: bold;"
+        );
+
+        Label monthlyExpensesValue =
+                new Label("0.00 CHF");
+
+        Label monthlyBalanceTitle =
+                new Label("Saldo");
+        monthlyBalanceTitle.setStyle(
+                "-fx-font-weight: bold;"
+        );
+
+        Label monthlyBalanceValue =
+                new Label("0.00 CHF");
+
+        VBox monthlyIncomeBox =
+                new VBox(
+                        5,
+                        monthlyIncomeTitle,
+                        monthlyIncomeValue
+                );
+
+        VBox monthlyExpensesBox =
+                new VBox(
+                        5,
+                        monthlyExpensesTitle,
+                        monthlyExpensesValue
+                );
+
+        VBox monthlyBalanceBox =
+                new VBox(
+                        5,
+                        monthlyBalanceTitle,
+                        monthlyBalanceValue
+                );
+
+        monthlyIncomeBox.setPrefWidth(180);
+        monthlyExpensesBox.setPrefWidth(180);
+        monthlyBalanceBox.setPrefWidth(180);
+
+        String monthlyBoxStyle =
+                "-fx-background-color: #f2f2f2;"
+                + "-fx-padding: 12;"
+                + "-fx-background-radius: 5;";
+
+        monthlyIncomeBox.setStyle(monthlyBoxStyle);
+        monthlyExpensesBox.setStyle(monthlyBoxStyle);
+        monthlyBalanceBox.setStyle(monthlyBoxStyle);
+
+
+        HBox monthlySummaryBox =
+                new HBox(
+                        10,
+                        monthlyIncomeBox,
+                        monthlyExpensesBox,
+                        monthlyBalanceBox
+                );
+
         // Button zum Erfassen eines Kontos
 
         Button addAccountButton =
@@ -276,7 +394,38 @@ public class FinanceManagerApp extends Application {
                     balanceValue,
                     transactionBox,
                     financeService,
-                    transactionRepository
+                    transactionRepository,
+                    monthComboBox.getValue(),
+                    monthlyIncomeValue,
+                    monthlyExpensesValue,
+                    monthlyBalanceValue
+            );
+        });
+
+
+        monthComboBox.setOnAction(event -> {
+
+            Account selectedAccount =
+                    accountComboBox.getValue();
+
+            YearMonth selectedMonth =
+                    monthComboBox.getValue();
+
+            if (selectedAccount == null
+                    || selectedMonth == null) {
+                return;
+            }
+
+            updateDashboard(
+                    selectedAccount,
+                    balanceValue,
+                    transactionBox,
+                    financeService,
+                    transactionRepository,
+                    selectedMonth,
+                    monthlyIncomeValue,
+                    monthlyExpensesValue,
+                    monthlyBalanceValue
             );
         });
 
@@ -306,7 +455,11 @@ public class FinanceManagerApp extends Application {
                                    balanceValue,
                                    transactionBox,
                                    financeService,
-                                   transactionRepository
+                                   transactionRepository,
+                                   monthComboBox.getValue(),
+                                   monthlyIncomeValue,
+                                   monthlyExpensesValue,
+                                   monthlyBalanceValue
                            );
 
                             System.out.println(
@@ -341,7 +494,11 @@ public class FinanceManagerApp extends Application {
                     balanceValue,
                     transactionBox,
                     financeService,
-                    transactionRepository
+                    transactionRepository,
+                    monthComboBox.getValue(),
+                    monthlyIncomeValue,
+                    monthlyExpensesValue,
+                    monthlyBalanceValue
             );
         }
 
@@ -356,6 +513,8 @@ public class FinanceManagerApp extends Application {
                 addAccountButton,
                 addTransactionButton,
                 transactionTitle,
+                monthComboBox,
+                monthlySummaryBox,
                 transactionHeader,
                 transactionBox
         );
@@ -1397,8 +1556,11 @@ public class FinanceManagerApp extends Application {
             TransactionRepository transactionRepository,
             Label balanceValue,
             VBox transactionBox,
-            FinanceService financeService
-
+            FinanceService financeService,
+            YearMonth selectedMonth,
+            Label monthlyIncomeValue,
+            Label monthlyExpensesValue,
+            Label monthlyBalanceValue
     ) {
 
         Label dateLable =
@@ -1470,7 +1632,11 @@ public class FinanceManagerApp extends Application {
                             balanceValue,
                             transactionBox,
                             financeService,
-                            transactionRepository
+                            transactionRepository,
+                            selectedMonth,
+                            monthlyIncomeValue,
+                            monthlyExpensesValue,
+                            monthlyBalanceValue
                     );
                 } catch (SQLException exception) {
 
@@ -1525,7 +1691,11 @@ public class FinanceManagerApp extends Application {
                         balanceValue,
                         transactionBox,
                         financeService,
-                        transactionRepository
+                        transactionRepository,
+                        selectedMonth,
+                        monthlyIncomeValue,
+                        monthlyExpensesValue,
+                        monthlyBalanceValue
                 );
             } catch (SQLException exception) {
 
@@ -1571,7 +1741,11 @@ public class FinanceManagerApp extends Application {
             Label balanceValue,
             VBox transactionBox,
             FinanceService financeService,
-            TransactionRepository transactionRepository
+            TransactionRepository transactionRepository,
+            YearMonth selectedMonth,
+            Label monthlyIncomeValue,
+            Label monthlyExpensesValue,
+            Label monthlyBalanceValue
     ) {
         BigDecimal balance =
                 financeService.calculateBalance(account);
@@ -1583,9 +1757,52 @@ public class FinanceManagerApp extends Application {
                 )
         );
 
+        BigDecimal monthlyIncome =
+                financeService.calculateTotalIncomeForMonth(
+                        account,
+                        selectedMonth
+                );
+
+        BigDecimal monthlyExpenses =
+                financeService.calculateTotalExpensesForMonth(
+                        account,
+                        selectedMonth
+                );
+
+        BigDecimal monthlyBalance =
+                financeService.calculateBalanceForMonth(
+                        account,
+                        selectedMonth
+                );
+
+        monthlyIncomeValue.setText(
+                    formatAmount(
+                            monthlyIncome,
+                            account.getCurrency()
+                )
+        );
+
+        monthlyExpensesValue.setText(
+                formatAmount(
+                            monthlyExpenses,
+                            account.getCurrency()
+                )
+        );
+
+        monthlyBalanceValue.setText(
+                formatAmount(
+                        monthlyBalance,
+                        account.getCurrency()
+                )
+        );
+
+
         transactionBox.getChildren().clear();
 
-        account.getTransactions()
+        financeService.getTransactionsForMonth(
+                account,
+                selectedMonth
+        )
                 .stream()
                 .sorted(
                         Comparator.comparing(
@@ -1600,7 +1817,11 @@ public class FinanceManagerApp extends Application {
                                         transactionRepository,
                                         balanceValue,
                                         transactionBox,
-                                        financeService
+                                        financeService,
+                                        selectedMonth,
+                                        monthlyIncomeValue,
+                                        monthlyExpensesValue,
+                                        monthlyBalanceValue
                                 )
                         )
                 );
