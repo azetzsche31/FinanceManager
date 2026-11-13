@@ -5,6 +5,7 @@ import ch.andre.financemanager.persistence.AccountRepository;
 import ch.andre.financemanager.persistence.DatabaseManager;
 import ch.andre.financemanager.persistence.TransactionRepository;
 import ch.andre.financemanager.service.FinanceService;
+import ch.andre.financemanager.persistence.AppPaths;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -25,17 +26,24 @@ import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.time.YearMonth;
+import java.io.IOException;
 
 
 public class FinanceManagerApp extends Application {
 
     @Override
-    public void start(Stage stage) throws SQLException {
+    public void start(Stage stage) throws SQLException, IOException {
 
         FinanceService financeService = new FinanceService();
 
+        // Bestehende Datenbank bei Bedarf übernehmen
+        AppPaths.migrateDatabase();
+
+        // Datenbank am neuen Speicherort öffnen
         DatabaseManager databaseManager =
-                new DatabaseManager("finance-manager.db");
+                new DatabaseManager(
+                        AppPaths.getDatabasePath().toString()
+                );
 
         databaseManager.createAccountsTable();
         databaseManager.createTransactionsTable();

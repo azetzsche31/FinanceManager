@@ -1,283 +1,92 @@
 # Finance Manager
 
-🚀 **Aktuelle Version: 1.1 – in Entwicklung**
+**Windows-Paketversion: 1.0.0**  
+**Projektstatus: In aktiver Entwicklung**
 
-Eine Java-Konsolenanwendung zur Verwaltung persönlicher Finanzen.
+Finance Manager ist eine Java-Anwendung zur Verwaltung persönlicher Finanzen mit einer grafischen Benutzeroberfläche auf Basis von JavaFX und einer lokalen SQLite-Datenbank.
 
-Das Projekt dient dazu, moderne Java-Entwicklung mit objektorientiertem Design, Test-Driven Development (TDD), JUnit-Tests, Maven und Datenbank-Persistenz praktisch zu erlernen.
+Das Projekt dient dazu, moderne Java-Entwicklung, objektorientiertes Design, Test-Driven Development (TDD), Datenbank-Persistenz und die Bereitstellung einer Windows-Desktopanwendung praktisch zu erlernen.
 
 ## Technologien
 
-* Java 25 LTS
-* Maven
-* JUnit 5
-* SQLite
-* SQLite JDBC
-* Git
-* GitHub
-* IntelliJ IDEA Community
-
-### Geplante Technologien
-
-* JavaFX
+- Java 25 LTS
+- JavaFX 25
+- Maven
+- JUnit
+- SQLite und SQLite JDBC
+- jpackage
+- WiX Toolset 6
+- Git und GitHub
+- IntelliJ IDEA Community
 
 ## Projektstatus
 
-🚀 **Version 1.0 abgeschlossen**
+Die Anwendung verfügt über eine funktionsfähige JavaFX-Oberfläche und eine SQLite-basierte Persistenz.
 
-🔧 **Version 1.1 in Entwicklung**
+Ein Windows-Installer wurde erfolgreich erstellt und lokal getestet.
 
-Die Anwendung verfügt inzwischen über eine SQLite-basierte Persistenz für Konten und Transaktionen.
+**Bereits umgesetzt:**
+- Grafische Benutzeroberfläche mit JavaFX
+- Verwaltung von Konten
+- Erfassung von Einnahmen und Ausgaben
+- Anzeige von Konten und Transaktionen
+- Berechnung von Kontoständen
+- Persistente Speicherung in SQLite
+- CSV-Import und CSV-Export in der bisherigen Projektentwicklung
+- Monats- und Jahresauswertungen in der bisherigen Projektentwicklung
+- Unit- und Integrationstests
+- Portable Windows-Anwendung
+- Windows-Installer mit Startmenü-Eintrag und Desktop-Verknüpfung
 
-Die Konsolenanwendung verwendet beim Start einen persistenten Default-Account und kann Transaktionen dauerhaft in der Datenbank speichern und wieder laden.
+Einige Funktionen der bisherigen Konsolenanwendung sind noch nicht vollständig in die JavaFX-Oberfläche integriert.
 
-Zusätzlich stehen CSV-Import und CSV-Export sowie Monats- und Jahresberichte zur Verfügung.
+## Installation unter Windows
 
-Die Entwicklung erfolgt schrittweise nach dem **Test-Driven-Development-Prinzip**.
+### Voraussetzungen
 
-## Bereits implementierte Funktionen
+Für die Installation und Nutzung der bereitgestellten Windows-Version sind weder eine separate Java-Installation noch Maven oder IntelliJ erforderlich.
 
-### Finanzverwaltung
+### Installation
 
-* Konten verwalten
-* Einnahmen und Ausgaben erfassen
-* Kontostand berechnen
-* Transaktionen anzeigen
-* Einnahmen berechnen
-* Ausgaben berechnen
-* Auswertungen nach Kategorie
-* Monatsberichte erstellen
-* Jahresberichte erstellen
-* Nettoergebnis berechnen
+1. `FinanceManager-1.0.0.exe` herunterladen.
+2. Installationsprogramm ausführen.
+3. Installationsanweisungen folgen.
+4. Finance Manager über das Startmenü oder die Desktop-Verknüpfung starten.
 
-### CSV
+Der Installer enthält die benötigte Java-Laufzeitumgebung.
 
-* CSV-Import
-* Validierung der importierten Daten
-* Fehlerprotokoll beim Import
-* Persistenter CSV-Import in die SQLite-Datenbank
-* CSV-Export
-* Roundtrip-Test (CSV-Export → CSV-Import)
-* Unterstützung für Semikolon in CSV-Werten
-* Unterstützung für Anführungszeichen in CSV-Werten
+### Portable Version
 
-### Persistenz
+Alternativ kann die Anwendung ohne Installer verwendet werden.
 
-* SQLite-Datenbank integriert
-* Datenbankschema für Konten
-* Datenbankschema für Transaktionen
-* `AccountRepository` für die Konten-Persistenz
-* `TransactionRepository` für die Transaktions-Persistenz
-* `AccountLoader` zum Laden bzw. Erzeugen des Default-Accounts
-* Transaktionen können über die Anwendung in SQLite gespeichert werden
-* Gespeicherte Transaktionen können wieder aus SQLite geladen werden
-* Importierte CSV-Transaktionen werden persistent gespeichert
-* Persistenz durch Integrationstests abgesichert
+Dazu muss der gesamte durch `jpackage` erzeugte Anwendungsordner kopiert werden.
 
-### Berichte und Auswertungen
+Anschliessend kann `FinanceManager.exe` direkt gestartet werden.
 
-* Monatsberichte
-* Jahresberichte
-* Einnahmen nach Zeitraum
-* Ausgaben nach Zeitraum
-* Nettoergebnis nach Zeitraum
-* Ausgaben nach Kategorie
-* Berichte für Zeiträume ohne Transaktionen
+## Datenspeicherung
 
-### Anwendung
+Finance Manager verwendet SQLite zur lokalen Speicherung der Finanzdaten.
 
-* Konsolenmenü
-* Transaktionen über die Anwendung erfassen
-* Kontostand nach dem Erfassen einer Transaktion anzeigen
-* Persistente Daten beim Programmstart laden
-* CSV-Import über das Menü
-* CSV-Export über das Menü
+Die Datenbank befindet sich unter Windows im Verzeichnis:
 
-## Geplante Funktionen
+`%LOCALAPPDATA%\FinanceManager\finance-manager.db`
 
-* JavaFX-Benutzeroberfläche
-* Dashboard
-* Finanzübersichten visualisieren
-* Diagramme
-* Such- und Filterfunktionen
-* Budgetplanung
-* Sparziele
-* Erweiterte Auswertungen
-* Mehrere Konten komfortabel verwalten
+Dieses Verzeichnis liegt ausserhalb des Installationsordners.
 
-## Versionshistorie
+Dadurch bleiben die Finanzdaten bei einem regulären Anwendungsupdate grundsätzlich erhalten, sofern die Datenbank nicht gelöscht oder durch eine inkompatible Schemaänderung verändert wird.
 
-### Version 0.1
+**Hinweis:** Vor Updates wird empfohlen, eine Sicherung der Datenbank anzulegen.
 
-* Maven-Projekt eingerichtet
-* Git-Repository erstellt
-* Projektstruktur aufgebaut
+### Datenbanktabellen
 
-### Version 0.2
-
-* Domänenmodell erstellt
-* `Account` und `Transaction` implementiert
-* Enums eingeführt
-
-### Version 0.3
-
-* `FinanceService` implementiert
-* Kontostand, Einnahmen und Ausgaben berechnen
-* Erster JUnit-Test
-
-### Version 0.4
-
-* CSV-Import mit Validierung
-* Fehlerprotokoll
-* Refactoring
-
-### Version 0.5
-
-* CSV-Export
-* Roundtrip-Test
-* Unterstützung für Sonderzeichen in CSV
-
-### Version 1.0
-
-* Konsolenmenü
-* Transaktionen erfassen
-* Kontostand anzeigen
-* Monats- und Jahresberichte
-* CSV-Import und CSV-Export über das Menü
-
-### Version 1.1 – in Entwicklung
-
-* SQLite integriert
-* Datenbankschema für Konten und Transaktionen
-* `AccountRepository` implementiert
-* `TransactionRepository` implementiert
-* `AccountLoader` implementiert
-* Persistenter Default-Account
-* Transaktionen über `Main` in SQLite speichern
-* Transaktionen aus SQLite laden
-* CSV-Import persistent in SQLite speichern
-* Monats- und Jahresberichte erweitert
-* Nettoergebnis berechnen
-* Ausgaben nach Kategorie auswerten
-* Persistenztests mit JUnit
-* Integrationstests für CSV und Persistenz
-* TDD-basierte Weiterentwicklung
-
-## Qualität
-
-Die Entwicklung erfolgt schrittweise nach dem **Test-Driven-Development-Prinzip**.
-
-Aktuell eingesetzt:
-
-* Unit-Tests mit JUnit 5
-* Tests für `FinanceService`
-* Tests für Monats- und Jahresberichte
-* Tests für Auswertungen nach Kategorie
-* Tests für CSV-Import
-* Tests für CSV-Export
-* Tests für CSV-Sonderzeichen
-* Roundtrip-Tests für CSV-Export und CSV-Import
-* Persistenztests für SQLite
-* Tests für `AccountRepository`
-* Tests für `TransactionRepository`
-* Tests für `AccountLoader`
-* Integrationstests für die Kombination aus Anwendung und Persistenz
-
-Ziel ist es, neue Funktionen zunächst durch Tests abzusichern und anschließend die Implementierung weiterzuentwickeln.
-
-## Projektstruktur
-
-```text
-src/
-├── main/
-│   ├── java/
-│   │   └── ch/andre/financemanager/
-│   │       ├── Main.java
-│   │       │
-│   │       ├── model/
-│   │       │   ├── Account.java
-│   │       │   ├── Transaction.java
-│   │       │   ├── MonthlyReport.java
-│   │       │   ├── YearlyReport.java
-│   │       │   ├── CsvImportResult.java
-│   │       │   ├── CsvImportError.java
-│   │       │   ├── AccountType.java
-│   │       │   ├── TransactionType.java
-│   │       │   └── Category.java
-│   │       │
-│   │       ├── persistence/
-│   │       │   ├── DatabaseManager.java
-│   │       │   ├── AccountRepository.java
-│   │       │   ├── TransactionRepository.java
-│   │       │   └── AccountLoader.java
-│   │       │
-│   │       └── service/
-│   │           ├── FinanceService.java
-│   │           ├── CsvImportService.java
-│   │           └── CsvExportService.java
-│   │
-│   └── resources/
-│
-└── test/
-    ├── java/
-    │   └── ch/andre/financemanager/
-    │       ├── MainTest.java
-    │       │
-    │       ├── persistence/
-    │       │   ├── AccountRepositoryTest.java
-    │       │   ├── TransactionRepositoryTest.java
-    │       │   └── AccountLoaderTest.java
-    │       │
-    │       └── service/
-    │           ├── FinanceServiceTest.java
-    │           ├── CsvImportServiceTest.java
-    │           ├── CsvExportServiceTest.java
-    │           └── CsvImportExportTest.java
-    │
-    └── resources/
-        └── csv/
-            └── transaction-import.csv
-```
-## Architektur
-```text
-Main
- │
- ├── Service Layer
- │   ├── FinanceService
- │   ├── CsvImportService
- │   └── CsvExportService
- │
- ├── Persistence Layer
- │   ├── AccountLoader
- │   ├── AccountRepository
- │   ├── TransactionRepository
- │   └── DatabaseManager
- │
- └── Domain Model
-     ├── Account
-     ├── Transaction
-     ├── MonthlyReport
-     ├── YearlyReport
-     ├── Category
-     └── weitere Modelle
-```
-
-## Datenbank
-
-Die Anwendung verwendet ***SQLite*** zur persistenten Speicherung der Finanzdaten.
-
-Aktuell werden folgende Daten gespeichert:
-
-### **Accounts**
-
+**Accounts**
 - ID
 - Name
 - Kontotyp
 - Eröffnungssaldo
 - Währung
 
-### **Transactions**
-
+**Transactions**
 - ID
 - Konto
 - Datum
@@ -286,62 +95,210 @@ Aktuell werden folgende Daten gespeichert:
 - Transaktionstyp
 - Kategorie
 
-Die Datenbank wird beim Start der Anwendung geladen bzw. der Default-Account wird bei Bedarf automatisch angelegt.
+## Anwendung entwickeln
+
+### Voraussetzungen
+
+- JDK 25
+- Apache Maven
+- IntelliJ IDEA oder eine andere Java-IDE
+
+### Projekt bauen
+
+```powershell
+mvn clean package
+```
+
+### Tests ausführen
+
+```powershell
+mvn test
+```
+
+### JavaFX-Anwendung starten
+
+```powershell
+mvn javafx:run
+```
+
+### Anwendung direkt über Java starten
+
+Nach einem erfolgreichen Maven-Build:
+
+```powershell
+java -cp "target/finance-manager-1.0-SNAPSHOT.jar;target/libs/*" ch.andre.financemanager.FinanceManagerLauncher
+```
+
+## Architektur
+
+Das Projekt ist in mehrere Verantwortungsbereiche unterteilt.
+
+### Domain Model
+
+Enthält die Finanzmodelle und zugehörigen Datentypen.
+
+Beispiele:
+- `Account`
+- `Transaction`
+- `AccountType`
+- `TransactionType`
+- `Category`
+- `MonthlyReport`
+- `YearlyReport`
+
+### Service Layer
+
+Enthält die Geschäftslogik.
+
+Beispiele:
+- `FinanceService`
+- `CsvImportService`
+- `CsvExportService`
+
+### Persistence Layer
+
+Verwaltet die SQLite-Datenbank.
+
+Beispiele:
+- `DatabaseManager`
+- `AccountRepository`
+- `TransactionRepository`
+- `AccountLoader`
+- `AppPaths`
+
+### Application Layer
+
+Enthält die Einstiegspunkte und die grafische Benutzeroberfläche.
+
+- `Main` – bisherige Konsolenanwendung
+- `FinanceManagerApp` – JavaFX-Anwendung
+- `FinanceManagerLauncher` – Startklasse für die paketierte Anwendung
 
 ## CSV-Format
 
 Der CSV-Import und -Export verwendet Semikolon als Trennzeichen.
 
-Beispiel
+Beispiel:
 
-```text
-
+```csv
 date;amount;description;type;category
 2026-07-01;5000.00;Lohn;INCOME;SALARY
 2026-07-05;2500;Miete;EXPENSE;HOUSING
-
 ```
 
-CSV-Werte mit Semikolon oder Anführungszeichen werden entsprechend den CSV-Regeln maskiert.
+Semikolons und Anführungszeichen innerhalb von CSV-Werten werden entsprechend den CSV-Regeln behandelt.
 
-Beispiel
+## Qualität und Tests
 
-```text
+Die Entwicklung erfolgt schrittweise nach dem Test-Driven-Development-Prinzip.
 
-2026-07-10;45.50;"Restaurant; Abendessen";EXPENSE;GROCERIES
-2026-07-10;45.50;"Restaurant ""Abendessen""";EXPENSE;GROCERIES
-```
+Der bisherige Testumfang umfasst unter anderem:
 
-## Test-DRiven Development
+- Finanzberechnungen
+- Monats- und Jahresberichte
+- Kategorieauswertungen
+- CSV-Import und CSV-Export
+- CSV-Sonderzeichen und Roundtrip-Tests
+- SQLite-Persistenz
+- Repository-Tests
+- Integrationstests
 
-Das Projekt wird schrittweise nach dem **TDD-Prinzip** entwickelt:
+Beim letzten erfolgreichen Testlauf wurden 55 Tests ausgeführt.
 
-```text
-Test schreiben
-      ↓
-Test schlägt fehl
-      ↓
-Implementierung
-      ↓
-Test wird grün
-      ↓
-Refactoring
-      ↓
-Nächste Funktion
+### TDD-Ablauf
 
-```
-Dabei werden sowohl einzelne Services und Modelle als auch die Zusammenarbeit
-zwischen Anwendung, CSV-Verarbeitung und SQLite getestet.
+1. Test schreiben
+2. Test schlägt fehl
+3. Funktion implementieren
+4. Test erfolgreich ausführen
+5. Code refaktorieren
+6. Nächste Funktion entwickeln
+
+## Versionshistorie
+
+### Version 0.1
+
+- Maven-Projekt eingerichtet
+- Git-Repository erstellt
+- Projektstruktur aufgebaut
+
+### Version 0.2
+
+- Domänenmodell erstellt
+- `Account` und `Transaction` implementiert
+- Enums eingeführt
+
+### Version 0.3
+
+- `FinanceService` implementiert
+- Kontostand, Einnahmen und Ausgaben berechnen
+- Erste JUnit-Tests
+
+### Version 0.4
+
+- CSV-Import mit Validierung
+- Fehlerprotokoll
+- Refactoring
+
+### Version 0.5
+
+- CSV-Export
+- Roundtrip-Test
+- Unterstützung für CSV-Sonderzeichen
+
+### Version 1.0 – Konsolenanwendung
+
+- Konsolenmenü
+- Transaktionen erfassen
+- Kontostand anzeigen
+- Monats- und Jahresberichte
+- CSV-Import und CSV-Export
+
+### Version 1.1 – Weiterentwicklung
+
+- SQLite-Datenbank integriert
+- Datenbankschema für Konten und Transaktionen
+- Repository-Klassen implementiert
+- Persistenter Default-Account
+- Persistenter CSV-Import
+- Erweiterte Auswertungen
+- Persistenz- und Integrationstests
+- JavaFX-Oberfläche eingeführt
+- Konten und Transaktionen in der Oberfläche verwalten
+- Datenbank in das lokale Windows-Benutzerverzeichnis verlegt
+- Separate Startklasse für die paketierte Anwendung
+- Portable Windows-Anwendung erstellt
+- Windows-Installer mit jpackage und WiX erstellt
+
+### Windows-Paketversion 1.0.0
+
+- Erste lokal getestete installierbare Windows-Version
+- Java-Laufzeitumgebung im Installationspaket enthalten
+- Startmenü-Eintrag und Desktop-Verknüpfung
+- SQLite-Daten ausserhalb des Installationsverzeichnisses
+
+## Geplante Funktionen
+
+- Dashboard
+- Diagramme und Finanzvisualisierungen
+- Such- und Filterfunktionen
+- Budgetplanung
+- Sparziele
+- Erweiterte Auswertungen in der JavaFX-Oberfläche
+- Weitere Verbesserungen der Kontenverwaltung
+- Automatische Update-Prüfung
+- Veröffentlichung über GitHub Releases
+- Datenbankmigrationen bei zukünftigen Schemaänderungen
 
 ## Nächste Entwicklungsschritte
-1. Architektur für die Benutzeroberfläche vorbereiten
-2. JavaFX in das Maven-Projekt integrieren
-3. JavaFX-Anwendung als separaten UI-Einstiegspunkt aufbauen
-4. Hauptfenster und Navigation erstellen 
-5. Konten- und Transaktionsübersicht als UI umsetzen 
-6. Dashboard und Finanzübersicht visualisieren
-7. Diagramme und weitere Visualisierungen hinzufügen
+
+1. Git-Repository und `.gitignore` überprüfen
+2. Aktuellen Entwicklungsstand committen
+3. Windows-Version auf einem weiteren PC testen
+4. GitHub Release vorbereiten
+5. Versionsverwaltung für zukünftige Updates verbessern
+6. Weitere JavaFX-Funktionen entwickeln
 
 ## Autor
-Andreas
 
+Andreas
