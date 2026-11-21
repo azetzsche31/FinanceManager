@@ -6,6 +6,8 @@ import ch.andre.financemanager.persistence.DatabaseManager;
 import ch.andre.financemanager.persistence.TransactionRepository;
 import ch.andre.financemanager.service.FinanceService;
 import ch.andre.financemanager.persistence.AppPaths;
+import ch.andre.financemanager.update.UpdateService;
+import ch.andre.financemanager.AppVersion;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -18,6 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import javafx.application.Platform;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -27,6 +30,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.time.YearMonth;
 import java.io.IOException;
+import java.awt.Desktop;
+import java.net.URI;
 
 
 public class FinanceManagerApp extends Application {
@@ -539,6 +544,7 @@ public class FinanceManagerApp extends Application {
         stage.setTitle("Finanace Manager");
         stage.setScene(scene);
         stage.show();
+        checkForUpdates();
     }
 
     private Optional<Transaction> showTransactionDialog(
@@ -1855,6 +1861,72 @@ public class FinanceManagerApp extends Application {
         return format.format(amount)
                 + " "
                 + currency.getCurrencyCode();
+    }
+
+    private void checkForUpdates() {
+
+        Thread updateThread = new Thread(() -> {
+
+            try {
+                UpdateService updateService = new UpdateService();
+
+                String json = updateService.fetchLatestRelease();
+
+                boolean updateAvailable = updateService.isUpdateAvailable(json);
+
+                if (updateAvailable) {
+
+                    String latestVersion = updateService.extractVersion(json);
+                    String releaseUrl = updateService.extractReleaseUrl(json);
+
+                    Platform.runLater(() ->
+                            showUpdateDialog(latestVersion, releaseUrl)
+                    );
+                } else {
+                    System.out.println("FinanceManager ist aktuell."    );
+                }
+
+            } catch (Exception e) {
+                System.err.println(
+                        "Update-Prüfung fehlgeschlagen: " + e.getMessage()
+                );
+            }
+        });
+
+        updateThread.setDaemon(true);
+        updateThread.start();
+    }
+
+    private void showUpdateDialog(String latestVersion, String releaseUrl) {
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+        alert.setTitle("Finance Manager - Update");
+        alert.setHeaderText("Neue Version verfügbar");
+
+        alert.setContentText(
+                "Die Version " + latestVersion + " ist verfügbar.\n\n"
+                + "Möchtest du die Download-Seite öffnen?"
+        );
+
+        ButtonType downloadButton = new ButtonType("Download-Seite öffnen");
+        ButtonType cancelButton = new ButtonType("Später");
+
+        alert.getButtonTypes().setAll(downloadButton, cancelButton);
+
+        alert.showAndWait().ifPresent(result -> {
+
+            if (result == downloadButton) {
+                try {
+                    Desktop.getDesktop().browse(URI.create(releaseUrl));
+                } catch (Exception e) {
+                    System.err.println(
+                            "Download-Seite konnte nicht geöffnet werden: "
+                            + e.getMessage()
+                    );
+                }
+            }
+        });
     }
 
 
