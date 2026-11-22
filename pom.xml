@@ -8,7 +8,7 @@
 
     <groupId>ch.andre</groupId>
     <artifactId>finance-manager</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 
     <properties>
         <maven.compiler.release>25</maven.compiler.release>
